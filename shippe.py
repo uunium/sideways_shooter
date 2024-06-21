@@ -30,9 +30,9 @@ class Ship:
     def moving(self):
         '''Move the ship up or down'''
 
-        if self.move_up:
+        if self.move_up and self.rect.top > 0:
             self.y -= self.settings.ship_speed
-        elif self.move_down:
+        elif self.move_down and self.rect.bottom <= self.screen_rect.bottom:
             self.y += self.settings.ship_speed
 
         self.rect.y = self.y

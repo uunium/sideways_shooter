@@ -64,7 +64,6 @@ class Game:
                 self.bullets.remove(bullet)
 
 
-
     def _keyup_event(self, event):
         match (event.key):
             case pygame.K_UP | pygame.K_w:
