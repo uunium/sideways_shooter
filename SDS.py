@@ -33,3 +33,8 @@ class Game:
         self.screen.fill((0, 0, 0))
         self.ship.blitme()
         pygame.display.flip()
+
+
+if __name__ == '__main__':
+    gameinst = Game()
+    gameinst.run_game()
