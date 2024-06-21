@@ -2,6 +2,7 @@ import pygame, sys
 
 
 from ship import Ship
+from settings import Settings
 
 
 class Game:
@@ -9,11 +10,18 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
 
-        self.screen = pygame.display.set_mode((1280, 720))
-        self.screen_rect = self.screen.get_rect()
+        self.settings = Settings(self)
         self.clock = pygame.time.Clock()
 
+        self.screen = pygame.display.set_mode(
+            (self.settings.screen_width, self.settings.screen_height)
+        )
+        self.screen_rect = self.screen.get_rect()
+        
         self.ship = Ship(self)
+
+
+
     
 
     def run_game(self):
@@ -29,8 +37,8 @@ class Game:
             
     
     def _update_screen(self):
-        self.clock.tick(60)
-        self.screen.fill((0, 0, 0))
+        self.clock.tick(self.settings.framerate)
+        self.screen.fill(self.settings.screen_color)
         self.ship.blitme()
         pygame.display.flip()
 
