@@ -14,7 +14,7 @@ class Ship:
 
         # load image as surface and rotate it 90 degrees clockwise, and
         # scale it 20%
-        self.image = pygame.image.load(self.ship_path)
+        self.image = pygame.image.load(self.ship_path).convert_alpha()
         self.image = pygame.transform.rotate(self.image, -90)
         self.image = pygame.transform.scale_by(self.image, 1.2)
         

@@ -5,6 +5,7 @@ from shippe import Ship
 from settings import Settings
 from bullette import Bullet
 
+# https://opengameart.org/content/space-9
 
 class Game:
     
@@ -18,7 +19,7 @@ class Game:
             (self.settings.screen_width, self.settings.screen_height)
         )
         self.screen_rect = self.screen.get_rect()
-
+        self.background = pygame.image.load('./images/space.png').convert()
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
 
@@ -74,12 +75,18 @@ class Game:
     
     def _update_screen(self):
         self.clock.tick(self.settings.framerate)
-        self.screen.fill(self.settings.screen_color)
+        self._fill_background()
+        # self.screen.fill(self.settings.screen_color)
+        self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
-        self.ship.blitme()
         pygame.display.flip()
 
+
+    def _fill_background(self):
+        for y in range(0, self.screen.get_height(), self.background.get_height()):
+            for x in range(0, self.screen.get_width(), self.background.get_width()):
+                self.screen.blit(self.background, (x, y))
 
 if __name__ == '__main__':
     gameinst = Game()
