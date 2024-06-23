@@ -75,18 +75,18 @@ class Game:
     
     def _update_screen(self):
         self.clock.tick(self.settings.framerate)
-        self._fill_background()
-        # self.screen.fill(self.settings.screen_color)
+        self._blit_background()
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         pygame.display.flip()
 
 
-    def _fill_background(self):
+    def _blit_background(self):
         for y in range(0, self.screen.get_height(), self.background.get_height()):
             for x in range(0, self.screen.get_width(), self.background.get_width()):
                 self.screen.blit(self.background, (x, y))
+
 
 if __name__ == '__main__':
     gameinst = Game()
