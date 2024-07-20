@@ -9,4 +9,10 @@ class Settings:
 
         self.bullet_speed = 3
         self.bullet_color = (255, 0, 0)
+
+        self.alien_hor_speed = 5
+        self.alien_ver_speed = 2
+        #direction should be 1 or -1
+        self.alien_direction = 1
+
         

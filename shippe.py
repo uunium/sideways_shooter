@@ -8,9 +8,7 @@ class Ship:
         self.screen_rect = gameclass.screen_rect
         self.settings = gameclass.settings
 
-        self.ship_path = (r'C:\Users\uuniu\Documents\Python\Crash_course_python'
-                            r'\alieninvasion\images/White_Ship_Space.png'
-                        )
+        self.ship_path = 'images/White_Ship_Space.png'
 
         # load image as surface and rotate it 90 degrees clockwise, and
         # scale it 20%
