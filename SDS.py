@@ -4,6 +4,7 @@ import pygame, sys
 from shippe import Ship
 from settings import Settings
 from bullette import Bullet
+from alienne import Alien
 
 # https://opengameart.org/content/space-9
 
@@ -22,6 +23,7 @@ class Game:
         self.background = pygame.image.load('./images/space.png').convert()
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.aliens = pygame.sprite.Group()
 
 
     def run_game(self):
@@ -64,7 +66,22 @@ class Game:
             if bullet.rect.left >= self.screen_rect.right:
                 self.bullets.remove(bullet)
 
+    def _update_aliens(self):
+        for alien in self.aliens.sprites():
+            alien.update()
 
+    def _create_fleet(self):
+        adam = Alien(self)
+        x = adam.rect.width
+        y = adam.rect.height
+        while x >= adam.rect.width * 4:
+            while y <= self.screen_rect.height:
+                new_alien = Alien(self)
+                new_alien.rect.y = y
+                self.aliens.add(new_alien)
+                y += new_alien.rect.height * 2
+            x += adam.rect.width *2
+     
     def _keyup_event(self, event):
         match (event.key):
             case pygame.K_UP | pygame.K_w:
@@ -77,6 +94,7 @@ class Game:
         self.clock.tick(self.settings.framerate)
         self._blit_background()
         self.ship.blitme()
+        self.aliens.draw(self.screen)
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         pygame.display.flip()
@@ -91,3 +109,6 @@ class Game:
 if __name__ == '__main__':
     gameinst = Game()
     gameinst.run_game()
+
+
+    

@@ -17,3 +17,6 @@ class Alien(pygame.sprite.Sprite):
 
     def update(self):
         self.rect.y += self.settings.alien_ver_speed * self.settings.alien_direction
+
+    def check_edges(self):
+        return (self.rect.top >= 0) or (self.rect.bottom <= self.screen_rect.height)
