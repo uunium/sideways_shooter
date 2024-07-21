@@ -2,7 +2,7 @@ import pygame, sys
 
 
 from shippe import Ship
-from settings import Settings
+from settingsu import Settings
 from bullette import Bullet
 from alienne import Alien
 
@@ -33,7 +33,7 @@ class Game:
             self._check_events()
             self.ship._update_ship()
             self._update_bullets()
-            # self._update_aliens()
+            self._update_aliens()
 
     def _check_events(self):
         for event in pygame.event.get():
@@ -66,26 +66,33 @@ class Game:
 
     def _create_fleet(self):
         adam = Alien(self)
-        x = self.screen_rect.width - adam.rect.width * 2
-        y = adam.rect.height
-        print('Alien created')
+        x = self.ship.rect.width * 15
+        y = self.screen_rect.centery - adam.rect.height * 8
 
-        while x >= adam.rect.width * 10:
-            while y <= self.screen_rect.height:
+        for row in range(4):
+            for line in range(8):
                 new_alien = Alien(self)
                 new_alien.rect.y = y
                 new_alien.rect.x = x
                 self.aliens.add(new_alien)
                 y += new_alien.rect.height * 2
-                print('Alien created')
+                print("Alien created")
 
-            x -= adam.rect.width * 2
-            y = adam.rect.height
-            print('New Fleet row created')
+            x += adam.rect.width * 2
+            y = self.screen_rect.centery - adam.rect.height * 8
+            print("New Fleet row created")
 
-    # def _update_aliens(self):
-    #     for alien in self.aliens.sprites():
-    #         alien.update()
+    def _fleet_check_borders(self):
+        for alien in self.aliens.sprites():
+            if alien.check_edges():
+                for alien in self.aliens.sprites():
+                    alien.rect.x -= self.settings.alien_hor_speed
+                self.settings.alien_direction *= -1
+                break
+
+    def _update_aliens(self):
+        self._fleet_check_borders()
+        self.aliens.update()
 
     def _keyup_event(self, event):
         match (event.key):
