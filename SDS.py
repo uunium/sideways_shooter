@@ -59,6 +59,7 @@ class Game:
         self.bullets.add(new_bullet)
 
     def _update_bullets(self):
+        pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
         self.bullets.update()
         for bullet in self.bullets.copy():
             if bullet.rect.left >= self.screen_rect.right:
