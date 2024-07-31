@@ -97,16 +97,21 @@ class Game:
             if alien.check_edges():
                 for alien in self.aliens.sprites():
                     alien.rect.x -= self.settings.alien_hor_speed
+                self._save_ver_speed()
                 self.settings.alien_movement_counter += 1
-                self.settings.alien_ver_speed = 0
                 self._count_hor_movement()
                 break
 
     def _count_hor_movement(self):
         if self.settings.alien_movement_counter == 10:
                 self.settings.alien_direction *= -1
-                self.settings.alien_ver_speed = 1
+                self.settings.alien_ver_speed = self._previous_ver_speed
                 self.settings.alien_movement_counter = 0
+
+    def _save_ver_speed(self):
+        if self.settings.alien_ver_speed != 0:
+            self._previous_ver_speed = self.settings.alien_ver_speed
+            self.settings.alien_ver_speed = 0
 
     def _update_aliens(self):
         self._fleet_check_borders()
