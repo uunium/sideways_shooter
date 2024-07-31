@@ -53,6 +53,15 @@ class Game:
                 self.ship.move_down = True
             case pygame.K_SPACE | pygame.K_RIGHT:
                 self._shoot_bullet()
+            case pygame.K_q:
+                sys.exit()
+
+    def _keyup_event(self, event):
+        match (event.key):
+            case pygame.K_UP | pygame.K_w:
+                self.ship.move_up = False
+            case pygame.K_DOWN | pygame.K_s:
+                self.ship.move_down = False
 
     def _shoot_bullet(self):
         new_bullet = Bullet(self)
@@ -88,19 +97,20 @@ class Game:
             if alien.check_edges():
                 for alien in self.aliens.sprites():
                     alien.rect.x -= self.settings.alien_hor_speed
-                self.settings.alien_direction *= -1
+                self.settings.alien_movement_counter += 1
+                self.settings.alien_ver_speed = 0
+                self._count_hor_movement()
                 break
+
+    def _count_hor_movement(self):
+        if self.settings.alien_movement_counter == 10:
+                self.settings.alien_direction *= -1
+                self.settings.alien_ver_speed = 1
+                self.settings.alien_movement_counter = 0
 
     def _update_aliens(self):
         self._fleet_check_borders()
         self.aliens.update()
-
-    def _keyup_event(self, event):
-        match (event.key):
-            case pygame.K_UP | pygame.K_w:
-                self.ship.move_up = False
-            case pygame.K_DOWN | pygame.K_s:
-                self.ship.move_down = False
 
     def _update_screen(self):
         self.clock.tick(self.settings.framerate)
