@@ -66,6 +66,7 @@ class Game:
     def _shoot_bullet(self):
         new_bullet = Bullet(self)
         self.bullets.add(new_bullet)
+        print('Bullet shot')
 
     def _update_bullets(self):
         pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
@@ -103,15 +104,19 @@ class Game:
                 break
 
     def _count_hor_movement(self):
+        '''used to continue vertical movement of aliens'''
         if self.settings.alien_movement_counter == 10:
                 self.settings.alien_direction *= -1
                 self.settings.alien_ver_speed = self._previous_ver_speed
                 self.settings.alien_movement_counter = 0
 
     def _save_ver_speed(self):
+        '''used to save current movement speed of the ship and 
+        nulify it for smooth alien movement'''
         if self.settings.alien_ver_speed != 0:
             self._previous_ver_speed = self.settings.alien_ver_speed
             self.settings.alien_ver_speed = 0
+            print('Border reached')
 
     def _update_aliens(self):
         self._fleet_check_borders()
