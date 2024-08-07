@@ -35,7 +35,11 @@ class Ship:
 
         self.rect.y = self.y
 
+    def _center_ship(self):
+        self.rect.midleft = self.screen_rect.midleft
+        self.y = float(self.rect.y)
 
+    
     def _update_ship(self):
         self.moving()
 

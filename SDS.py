@@ -1,4 +1,5 @@
 import pygame, sys
+from time import sleep
 
 
 from shippe import Ship
@@ -14,13 +15,14 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
 
-        self.settings = Settings(self)
+        self.settings = Settings()
         self.clock = pygame.time.Clock()
 
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height)
         )
         self.screen_rect = self.screen.get_rect()
+        self.game_active = True
         self.background = pygame.image.load("./images/space.png").convert()
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
@@ -31,9 +33,10 @@ class Game:
         while True:
             self._update_screen()
             self._check_events()
-            self.ship._update_ship()
-            self._update_bullets()
-            self._update_aliens()
+            if self.game_active:
+                self.ship._update_ship()
+                self._update_bullets()
+                self._update_aliens()
 
     def _check_events(self):
         for event in pygame.event.get():
@@ -104,7 +107,7 @@ class Game:
                 break
 
     def _count_hor_movement(self):
-        '''used to continue vertical movement of aliens'''
+        '''used to continue horizontal movement of aliens'''
         if self.settings.alien_movement_counter == 10:
                 self.settings.alien_direction *= -1
                 self.settings.alien_ver_speed = self._previous_ver_speed
@@ -118,9 +121,32 @@ class Game:
             self.settings.alien_ver_speed = 0
             print('Border reached')
 
+    def _ship_hit(self):
+        if self.settings.ships_amount > 0:
+            sleep(1)
+            self.aliens.empty()
+            self.bullets.empty()
+            self.ship._center_ship()
+            self._create_fleet()
+            self.settings._reset_stuff(self)
+        else:
+            self.game_active = False
+            
+
+    def _check_collision(self):
+        if pygame.sprite.spritecollideany(self.ship, self.aliens):
+            print('Ship hit')
+            self.settings.ships_amount -= 1
+            self._ship_hit()
+
     def _update_aliens(self):
         self._fleet_check_borders()
         self.aliens.update()
+        if not self.aliens:
+            self.bullets.empty()
+            self._create_fleet()
+        self._check_collision()
+        
 
     def _update_screen(self):
         self.clock.tick(self.settings.framerate)
