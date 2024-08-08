@@ -106,6 +106,13 @@ class Game:
                 self._count_hor_movement()
                 break
 
+    def _fleet_check_earth_contact(self):
+        for alien in self.aliens.sprites():
+            if alien.rect.left <= 0:
+                print('Earth reached')
+                self._ship_hit()
+                break
+
     def _count_hor_movement(self):
         '''used to continue horizontal movement of aliens'''
         if self.settings.alien_movement_counter == 10:
@@ -123,7 +130,8 @@ class Game:
 
     def _ship_hit(self):
         if self.settings.ships_amount > 0:
-            sleep(1)
+            self.settings.ships_amount -= 1
+            sleep(0.5)
             self.aliens.empty()
             self.bullets.empty()
             self.ship._center_ship()
@@ -131,23 +139,21 @@ class Game:
             self.settings._reset_stuff(self)
         else:
             self.game_active = False
-            
 
     def _check_collision(self):
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
             print('Ship hit')
-            self.settings.ships_amount -= 1
             self._ship_hit()
 
     def _update_aliens(self):
         self._fleet_check_borders()
+        self._fleet_check_earth_contact()
         self.aliens.update()
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
         self._check_collision()
         
-
     def _update_screen(self):
         self.clock.tick(self.settings.framerate)
         self._blit_background()

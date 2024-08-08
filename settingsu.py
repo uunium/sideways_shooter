@@ -6,7 +6,7 @@ class Settings:
         self.framerate = 60
         
         self.ship_speed = 1.5
-        self.ships_amount = 3
+        self.ships_amount = 2
 
         self.bullet_speed = 3
         self.bullet_color = (255, 0, 0)
