@@ -6,6 +6,7 @@ from shippe import Ship
 from settingsu import Settings
 from bullette import Bullet
 from alienne import Alien
+from stattssu import GameStats
 
 # https://opengameart.org/content/space-9
 
@@ -22,6 +23,7 @@ class Game:
             (self.settings.screen_width, self.settings.screen_height)
         )
         self.screen_rect = self.screen.get_rect()
+        self.stats = GameStats(self)
         self.game_active = True
         self.background = pygame.image.load("./images/space.png").convert()
         self.ship = Ship(self)
@@ -129,8 +131,8 @@ class Game:
             print('Border reached')
 
     def _ship_hit(self):
-        if self.settings.ships_amount > 0:
-            self.settings.ships_amount -= 1
+        if self.stats.ships_left  > 0:
+            self.stats.ships_left -= 1
             sleep(0.5)
             self.aliens.empty()
             self.bullets.empty()
