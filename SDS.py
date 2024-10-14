@@ -8,7 +8,7 @@ from bullette import Bullet
 from alienne import Alien
 from stattssu import GameStats
 from menu import Menu
-from scoreboard import Scoreboard
+from scoreboarde import Scoreboard
 
 # https://opengameart.org/content/space-9
 
@@ -172,10 +172,7 @@ class Game:
         self._blit_background()
         self.ship.blitme()
         self.aliens.draw(self.screen)
-        self.menu.score_counter.draw_button()
-        self.menu.level.draw_button()
-        self.menu.hs.draw_button()
-        self.menu.ship.draw(self.screen)
+        self.menu.show_menu()
         if not self.game_active:
             self.menu.start_button.draw_button()
         for bullet in self.bullets.sprites():

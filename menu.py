@@ -62,3 +62,8 @@ class Menu:
             ship.rect.y = self.screen_rect.height - 10 - ship.rect.height
             self.ship.add(ship)
 
+    def show_menu(self):
+        self.score_counter.draw_button()
+        self.level.draw_button()
+        self.hs.draw_button()
+        self.ship.draw(self.screen)
