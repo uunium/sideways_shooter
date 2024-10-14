@@ -7,6 +7,8 @@ from settingsu import Settings
 from bullette import Bullet
 from alienne import Alien
 from stattssu import GameStats
+from menu import Menu
+from scoreboard import Scoreboard
 
 # https://opengameart.org/content/space-9
 
@@ -24,11 +26,14 @@ class Game:
         )
         self.screen_rect = self.screen.get_rect()
         self.stats = GameStats(self)
-        self.game_active = True
+        self.game_active = False
         self.background = pygame.image.load("./images/space.png").convert()
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
+        self.sb = Scoreboard(self)
+        self.menu = Menu(self)
+        
         self._create_fleet()
 
     def run_game(self):
@@ -49,7 +54,10 @@ class Game:
                     self._keydown_event(event)
                 case pygame.KEYUP:
                     self._keyup_event(event)
-
+                case pygame.MOUSEBUTTONDOWN:
+                    mouse_pos = pygame.mouse.get_pos()
+                    self.menu._button_press(mouse_pos)
+                
     def _keydown_event(self, event):
         match (event.key):
             case pygame.K_UP | pygame.K_w:
@@ -57,7 +65,10 @@ class Game:
             case pygame.K_DOWN | pygame.K_s:
                 self.ship.move_down = True
             case pygame.K_SPACE | pygame.K_RIGHT:
-                self._shoot_bullet()
+                if self.game_active:
+                    self._shoot_bullet()
+                elif event.key == pygame.K_SPACE:
+                    self.game_active = True
             case pygame.K_q:
                 sys.exit()
 
@@ -131,7 +142,7 @@ class Game:
             print('Border reached')
 
     def _ship_hit(self):
-        if self.stats.ships_left  > 0:
+        if self.stats.ships_left  > 1:
             self.stats.ships_left -= 1
             sleep(0.5)
             self.aliens.empty()
@@ -161,6 +172,12 @@ class Game:
         self._blit_background()
         self.ship.blitme()
         self.aliens.draw(self.screen)
+        self.menu.score_counter.draw_button()
+        self.menu.level.draw_button()
+        self.menu.hs.draw_button()
+        self.menu.ship.draw(self.screen)
+        if not self.game_active:
+            self.menu.start_button.draw_button()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         pygame.display.flip()
