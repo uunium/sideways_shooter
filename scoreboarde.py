@@ -8,7 +8,7 @@ class Scoreboard:
         self.alien_price = 100
 
         self.level = 1
-        self.speedup = 1.0
+        self.speedup = 1
 
         self.score = 0
         self.high_score = 0

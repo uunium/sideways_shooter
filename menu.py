@@ -63,7 +63,7 @@ class Menu:
             self.ship.add(ship)
 
     def show_menu(self):
-        self.score_counter.draw_button()
-        self.level.draw_button()
-        self.hs.draw_button()
+        self.screen.blit(self.hs.msg_image, self.hs.msg_rect)
+        self.screen.blit(self.score_counter.msg_image, self.score_counter.msg_rect)
+        self.screen.blit(self.level.msg_image, self.level.msg_rect)
         self.ship.draw(self.screen)

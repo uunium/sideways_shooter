@@ -85,7 +85,13 @@ class Game:
         print('Bullet shot')
 
     def _update_bullets(self):
-        pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+        collision = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
+        if collision:
+            for kill in collision.values():
+                self.sb.update_score()
+                self.menu._create_score()
+                self.menu._create_high_score()
+                
         self.bullets.update()
         for bullet in self.bullets.copy():
             if bullet.rect.left >= self.screen_rect.right:
