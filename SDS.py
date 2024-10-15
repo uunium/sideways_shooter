@@ -6,7 +6,6 @@ from shippe import Ship
 from settingsu import Settings
 from bullette import Bullet
 from alienne import Alien
-from stattssu import GameStats
 from menu import Menu
 from scoreboarde import Scoreboard
 
@@ -18,7 +17,7 @@ class Game:
     def __init__(self) -> None:
         pygame.init()
 
-        self.settings = Settings()
+        self.settings = Settings(self)
         self.clock = pygame.time.Clock()
 
         self.screen = pygame.display.set_mode(
@@ -31,9 +30,7 @@ class Game:
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self.sb = Scoreboard(self)
-        self.stats = GameStats(self)
         self.menu = Menu(self)
-        
         self._create_fleet()
 
     def run_game(self):
@@ -148,8 +145,8 @@ class Game:
             print('Border reached')
 
     def _ship_hit(self):
-        if self.stats.ships_left  > 1:
-            self.stats.ships_left -= 1
+        if self.settings.ships_left  > 1:
+            self.settings.ships_left -= 1
             sleep(0.5)
             self.aliens.empty()
             self.bullets.empty()
