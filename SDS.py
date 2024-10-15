@@ -25,13 +25,13 @@ class Game:
             (self.settings.screen_width, self.settings.screen_height)
         )
         self.screen_rect = self.screen.get_rect()
-        self.stats = GameStats(self)
         self.game_active = False
         self.background = pygame.image.load("./images/space.png").convert()
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.aliens = pygame.sprite.Group()
         self.sb = Scoreboard(self)
+        self.stats = GameStats(self)
         self.menu = Menu(self)
         
         self._create_fleet()
@@ -163,6 +163,7 @@ class Game:
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
             print('Ship hit')
             self._ship_hit()
+            self.menu._create_lives()
 
     def _update_aliens(self):
         self._fleet_check_borders()
@@ -171,6 +172,7 @@ class Game:
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
+            self.sb.update_game_speed()
         self._check_collision()
         
     def _update_screen(self):

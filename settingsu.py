@@ -8,11 +8,11 @@ class Settings:
         self.ship_speed = 1.5
         self.ships_amount = 3
 
-        self.bullet_speed = 3
+        self.bullet_speed = 20
         self.bullet_color = (255, 0, 0)
 
-        self.alien_hor_speed = 1
-        self.alien_ver_speed = 1
+        self.alien_hor_speed = 10
+        self.alien_ver_speed = 50
         self.alien_movement_counter = 0
         #direction should be 1 or -1
         self.alien_direction = -1
@@ -23,5 +23,6 @@ class Settings:
         self.alien_ver_speed = gameclass._previous_ver_speed
         self.alien_movement_counter = 0
         self.alien_direction = -1
+
 
         

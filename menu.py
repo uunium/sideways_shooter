@@ -38,7 +38,8 @@ class Menu:
     def _create_score(self):
         self.score_counter = Button(
             self.gameclass, f'{self.sb.score}', bg_color=None, tx_size=30,
-            height=0, width=0,)
+            height=0, width=0,
+            )
         self.score_counter.msg_rect.topleft = (
             self.screen_rect.width - self.score_counter.msg_rect.width - 10,
             self.hs.msg_rect.bottomleft[1] + 10
@@ -56,14 +57,15 @@ class Menu:
 
     def _create_lives(self):
         self.ship = Group()
-        for ship_num in range(self.settings.ships_amount):
+        for ship_num in range(self.gameclass.stats.ships_left):
             ship = Ship(self.gameclass)
             ship.rect.x = self.screen_rect.width - ship.rect.width - ship.rect.width * ship_num
             ship.rect.y = self.screen_rect.height - 10 - ship.rect.height
             self.ship.add(ship)
 
     def show_menu(self):
-        self.screen.blit(self.hs.msg_image, self.hs.msg_rect)
-        self.screen.blit(self.score_counter.msg_image, self.score_counter.msg_rect)
-        self.screen.blit(self.level.msg_image, self.level.msg_rect)
+        self.hs.draw_button()
+        self.score_counter.draw_button()
+        self.level.draw_button()
+
         self.ship.draw(self.screen)
