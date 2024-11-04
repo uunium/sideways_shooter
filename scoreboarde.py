@@ -22,11 +22,24 @@ class Scoreboard:
     def update_game_speed(self):
         self.level += 1
         self.gameclass.menu._create_level()
-        self.speedup = self.speedup + (0.05 * self.level)
-        self.settings.alien_hor_speed *= self.speedup
-        self.settings.alien_ver_speed *=  self.speedup
+        self.change_move_speed()
         self.alien_price *= self.speedup
 
+    def change_move_speed(self):
+        if self.settings.alien_hor_speed < 15:
+            self.speedup += 0.05
+            self.settings.alien_hor_speed += self.speedup
+        elif (self.settings.alien_hor_speed > 15 and 
+              self.settings.alien_ver_speed < 7):
+            self.speedup += 0.5
+            self.settings.alien_ver_speed +=  self.speedup
+        elif self.settings.alien_hor_speed < 20:
+            self.speedup += 0.1
+            self.settings.alien_hor_speed += self.speedup
+        elif self.level == 20:
+            self.settings.alien_hor_speed = 23
+            self.settings.alien_ver_speed = 9
+            
     def reset_stats(self):
         self.gameclass.settings.ships_left = 3
         self.alien_price = 100

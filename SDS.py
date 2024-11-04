@@ -19,6 +19,7 @@ class Game:
 
         self.settings = Settings(self)
         self.clock = pygame.time.Clock()
+        self.timer = 0
 
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height)
@@ -28,6 +29,8 @@ class Game:
         self.background = pygame.image.load("./images/space.png").convert()
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
+        self.last_shot_time = 0
+        self.shoot_bullet_mod = False
         self.aliens = pygame.sprite.Group()
         self.sb = Scoreboard(self)
         self.menu = Menu(self)
@@ -38,6 +41,8 @@ class Game:
             self._update_screen()
             self._check_events()
             if self.game_active:
+                timer = self.clock.get_time()
+                self.timer += timer
                 self.ship._update_ship()
                 self._update_bullets()
                 self._update_aliens()
@@ -63,7 +68,8 @@ class Game:
                 self.ship.move_down = True
             case pygame.K_SPACE | pygame.K_RIGHT:
                 if self.game_active:
-                    self._shoot_bullet()
+                    self.shoot_bullet()
+                    self.shoot_bullet_mod = True
                 elif event.key == pygame.K_SPACE:
                     self.game_active = True
             case pygame.K_q:
@@ -75,13 +81,24 @@ class Game:
                 self.ship.move_up = False
             case pygame.K_DOWN | pygame.K_s:
                 self.ship.move_down = False
+            case pygame.K_SPACE:
+                    if self.game_active:
+                        self.shoot_bullet_mod = False
 
-    def _shoot_bullet(self):
+    def shoot_bullet(self):
+        '''Create a bullet instance and draw it,
+        also save the time of the shot'''
+        self.last_shot_time = pygame.time.get_ticks()
         new_bullet = Bullet(self)
         self.bullets.add(new_bullet)
         print('Bullet shot')
 
     def _update_bullets(self):
+        # Get time difference betwen shots to have aftofire every self.settings.shot_delay miliseconds
+        shot_time_diff = pygame.time.get_ticks() - self.last_shot_time
+        if self.shoot_bullet_mod and shot_time_diff >= self.settings.shot_delay:
+            self.shoot_bullet()
+            
         collision = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
         if collision:
             for kill in collision.values():
@@ -117,9 +134,7 @@ class Game:
             if alien.check_edges():
                 for alien in self.aliens.sprites():
                     alien.rect.x -= self.settings.alien_hor_speed
-                self._save_ver_speed()
-                self.settings.alien_movement_counter += 1
-                self._count_hor_movement()
+                self.settings.alien_direction *= -1
                 break
 
     def _fleet_check_earth_contact(self):
@@ -129,20 +144,20 @@ class Game:
                 self._ship_hit()
                 break
 
-    def _count_hor_movement(self):
-        '''used to continue horizontal movement of aliens'''
-        if self.settings.alien_movement_counter == 10:
-                self.settings.alien_direction *= -1
-                self.settings.alien_ver_speed = self._previous_ver_speed
-                self.settings.alien_movement_counter = 0
+    # def _move_hor(self):
+    #     '''used to continue horizontal movement of aliens'''
+    #     move_duration = pygame.time.get_ticks() - self.hor_move_start
+    #     if move_duration > 500:
+    #             self.settings.alien_ver_speed = self._previous_ver_speed
+    #             self.settings.alien_movement_counter = 0
 
-    def _save_ver_speed(self):
-        '''used to save current movement speed of the ship and 
-        nulify it for smooth alien movement'''
-        if self.settings.alien_ver_speed != 0:
-            self._previous_ver_speed = self.settings.alien_ver_speed
-            self.settings.alien_ver_speed = 0
-            print('Border reached')
+    # def _save_ver_speed(self):
+    #     '''used to save current movement speed of the ship and 
+    #     nulify it for smooth alien movement'''
+    #     if self.settings.alien_ver_speed != 0:
+    #         self._previous_ver_speed = self.settings.alien_ver_speed
+    #         self.settings.alien_ver_speed = 0
+    #         print('Border reached')
 
     def _ship_hit(self):
         if self.settings.ships_left  > 1:
@@ -152,7 +167,7 @@ class Game:
             self.bullets.empty()
             self.ship._center_ship()
             self._create_fleet()
-            self.settings._reset_stuff(self)
+            # self.settings._reset_stuff()
         else:
             self.game_active = False
 
@@ -169,7 +184,9 @@ class Game:
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
+            # self.settings._reset_stuff()
             self.sb.update_game_speed()
+
         self._check_collision()
         
     def _update_screen(self):

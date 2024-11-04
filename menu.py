@@ -23,7 +23,7 @@ class Menu:
             self.gameclass.aliens.empty()
             self.gameclass._create_fleet()
             self.gameclass.sb.reset_stats()
-            self.settings._reset_stuff(self.gameclass)
+            # self.settings._reset_stuff(self.gameclass)
             self.gameclass.game_active = True
 
     def _create_high_score(self):
