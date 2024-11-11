@@ -167,10 +167,14 @@ class Game:
             self.bullets.empty()
             self.ship._center_ship()
             self._create_fleet()
-            # self.settings._reset_stuff()
+            
+            '''_create_lives має бути тут аби оновлювати кількість життів після 
+            кожного контакту з прибульцями'''
+            self.menu._create_lives()
         else:
             self.game_active = False
-
+            self.sb.game_lost = True
+            
     def _check_collision(self):
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
             print('Ship hit')
@@ -186,6 +190,9 @@ class Game:
             self._create_fleet()
             # self.settings._reset_stuff()
             self.sb.update_game_speed()
+            if self.sb.level == 21:
+                self.game_active = False
+                self.sb.game_won = True
 
         self._check_collision()
         
@@ -194,9 +201,9 @@ class Game:
         self._blit_background()
         self.ship.blitme()
         self.aliens.draw(self.screen)
-        self.menu.show_menu()
+        self.menu.show_interface()
         if not self.game_active:
-            self.menu.start_button.draw_button()
+            self.menu.menu_logic()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         pygame.display.flip()

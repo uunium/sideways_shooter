@@ -5,9 +5,13 @@ class Scoreboard:
         self.screen_rect = gameclass.screen_rect
         self.settings = gameclass.settings
 
+        self.game_lost = False
+        self.game_won = False
+        self.game_paused = False
+
         self.alien_price = 100
 
-        self.level = 1
+        self.level = 19
         self.speedup = 1
 
         self.score = 0
@@ -46,5 +50,9 @@ class Scoreboard:
         self.level = 1
         self.speedup = 1
         self.score = 0
-        self.gameclass.menu.create_menus()
+        self.gameclass.menu._create_menus()
+
+        self.game_lost = False
+        self.game_won = False
+        self.game_paused = False
     

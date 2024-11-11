@@ -1,4 +1,3 @@
-import pygame
 from pygame.sprite import Group
 
 from buttons import Button
@@ -12,18 +11,19 @@ class Menu:
         self.screen = gameclass.screen
         self.screen_rect = gameclass.screen_rect
         self.settings = gameclass.settings
+        self.sb = self.gameclass.sb
 
-        self.start_button = Button(gameclass, 'Start', bg_color=(145, 145, 145))
         
-        self.create_menus()
+        self._create_menus()
 
     def _button_press(self, mouse_pos):
-        if self.start_button.rect.collidepoint(mouse_pos):
+        if (self.start_button.rect.collidepoint(mouse_pos) or 
+            self.again_button.rect.collidepoint(mouse_pos)
+            ):
             self.gameclass.bullets.empty()
             self.gameclass.aliens.empty()
             self.gameclass._create_fleet()
             self.gameclass.sb.reset_stats()
-            # self.settings._reset_stuff(self.gameclass)
             self.gameclass.game_active = True
 
     def _create_high_score(self):
@@ -64,15 +64,51 @@ class Menu:
             ship.rect.y = self.screen_rect.height - 10 - ship.rect.height
             self.ship.add(ship)
 
-    def show_menu(self):
+    def _game_lost(self):
+        '''Text to render when player looses the game'''
+        self.looser_text = Button(
+            self.gameclass, 'You failed to defend The Earth', tx_size=60,
+            bg_color=None, height=0, width=0,)
+        self.looser_text.msg_rect.center = self.screen_rect.center
+        self.looser_text.msg_rect.bottom = self.start_button.msg_rect.top - 10
+
+    def _game_won(self):
+        '''Text to render when player wins the game'''
+        self.chad_text = Button(
+            self.gameclass, 'You defeated the Aliens', tx_size=60,
+            bg_color=None, height=0, width=0,)
+        self.chad_text.msg_rect.center = self.screen_rect.center
+        self.chad_text.msg_rect.bottom = self.start_button.msg_rect.top - 10
+
+    def menu_logic(self):
+        '''Decides which menu combo to show'''
+        if not self.sb.game_lost and not self.sb.game_won and not self.sb.game_paused:
+            self.start_button.draw_button()
+        elif self.sb.game_lost:
+            self.again_button.draw_button()
+            self.looser_text.draw_button()
+        elif self.sb.game_won:
+            self.again_button.draw_button()
+            self.chad_text.draw_button()
+        elif self.sb.game_paused:
+            self.resume_button.draw_button()
+
+    def show_interface(self):
         self.hs.draw_button()
         self.score_counter.draw_button()
         self.level.draw_button()
 
+
         self.ship.draw(self.screen)
 
-    def create_menus(self):
+    def _create_menus(self):
+        self.start_button = Button(self.gameclass, 'Start', bg_color=(145, 145, 145))
+        self.again_button = Button(self.gameclass, 'Play again', bg_color=(145, 145, 145))
+        self.resume_button = Button(self.gameclass, 'Resume', bg_color=(145, 145, 145))
+                
         self._create_high_score()
         self._create_score()
         self._create_level()
         self._create_lives()
+        self._game_lost()
+        self._game_won()
