@@ -54,7 +54,7 @@ class Scoreboard:
         # значення швидкостей визначаються тут
         self.settings.alien_hor_speed = 10
         self.settings.alien_ver_speed = 5
-        
+
         self.gameclass.menu._create_menus()
 
         self.gameclass.shoot_bullet_mod = False

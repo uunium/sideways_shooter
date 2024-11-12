@@ -13,18 +13,21 @@ class Menu:
         self.settings = gameclass.settings
         self.sb = self.gameclass.sb
 
-        
         self._create_menus()
 
     def _button_press(self, mouse_pos):
-        if (self.start_button.rect.collidepoint(mouse_pos) or 
-            self.again_button.rect.collidepoint(mouse_pos)
+        if ((self.start_button.rect.collidepoint(mouse_pos) or 
+            self.again_button.rect.collidepoint(mouse_pos)) and
+            not self.sb.game_paused
             ):
             self.gameclass.bullets.empty()
             self.gameclass.aliens.empty()
             self.gameclass._create_fleet()
             self.gameclass.sb.reset_stats()
             self.gameclass.game_active = True
+        elif (self.resume_button.rect.collidepoint(mouse_pos) and 
+            self.sb.game_paused):
+            self.pause_game()
 
     def _create_high_score(self):
         self.hs = Button(
@@ -108,8 +111,6 @@ class Menu:
         self.hs.draw_button()
         self.score_counter.draw_button()
         self.level.draw_button()
-
-
         self.ship.draw(self.screen)
 
     def _create_menus(self):
