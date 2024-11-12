@@ -13,10 +13,11 @@ class Settings:
         self.shot_delay = 100
         self.bullet_color = (255, 0, 0)
 
-        self.alien_hor_speed = 10
-        self.alien_ver_speed = 5
-        self.alien_movement_counter = 0
-        #direction should be 1 or -1
+        # фактичні значення швидкостей визначаються у бібліотеці scoreboarde.py
+        self.alien_hor_speed = 0
+        self.alien_ver_speed = 0
+
+        # direction should be 1 or -1
         self.alien_direction = -1
 
 

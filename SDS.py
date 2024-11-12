@@ -70,8 +70,11 @@ class Game:
                 if self.game_active:
                     self.shoot_bullet()
                     self.shoot_bullet_mod = True
-                elif event.key == pygame.K_SPACE:
-                    self.game_active = True
+                elif event.key == pygame.K_SPACE and not self.sb.game_paused:
+                    mouse_pos = self.screen_rect.center
+                    self.menu._button_press(mouse_pos)
+            case pygame.K_ESCAPE:
+                self.menu.pause_game()
             case pygame.K_q:
                 sys.exit()
 

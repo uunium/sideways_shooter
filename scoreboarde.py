@@ -11,7 +11,7 @@ class Scoreboard:
 
         self.alien_price = 100
 
-        self.level = 19
+        self.level = 1
         self.speedup = 1
 
         self.score = 0
@@ -50,8 +50,14 @@ class Scoreboard:
         self.level = 1
         self.speedup = 1
         self.score = 0
+
+        # значення швидкостей визначаються тут
+        self.settings.alien_hor_speed = 10
+        self.settings.alien_ver_speed = 5
+        
         self.gameclass.menu._create_menus()
 
+        self.gameclass.shoot_bullet_mod = False
         self.game_lost = False
         self.game_won = False
         self.game_paused = False

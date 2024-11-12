@@ -68,7 +68,8 @@ class Menu:
         '''Text to render when player looses the game'''
         self.looser_text = Button(
             self.gameclass, 'You failed to defend The Earth', tx_size=60,
-            bg_color=None, height=0, width=0,)
+            bg_color=None, height=0, width=0,
+            )
         self.looser_text.msg_rect.center = self.screen_rect.center
         self.looser_text.msg_rect.bottom = self.start_button.msg_rect.top - 10
 
@@ -76,9 +77,19 @@ class Menu:
         '''Text to render when player wins the game'''
         self.chad_text = Button(
             self.gameclass, 'You defeated the Aliens', tx_size=60,
-            bg_color=None, height=0, width=0,)
+            bg_color=None, height=0, width=0,
+            )
         self.chad_text.msg_rect.center = self.screen_rect.center
         self.chad_text.msg_rect.bottom = self.start_button.msg_rect.top - 10
+
+    def pause_game(self):
+        '''Changes game_paused flag to appropriate one'''
+        if self.sb.game_paused and not self.gameclass.game_active:
+            self.sb.game_paused = False
+            self.gameclass.game_active = True
+        elif self.gameclass.game_active and not self.sb.game_paused:
+            self.sb.game_paused = True
+            self.gameclass.game_active = False
 
     def menu_logic(self):
         '''Decides which menu combo to show'''
