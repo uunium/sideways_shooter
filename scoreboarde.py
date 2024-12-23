@@ -46,12 +46,18 @@ class Scoreboard:
               self.settings.alien_ver_speed < 7):
             self.speedup += 0.5
             self.settings.alien_ver_speed +=  self.speedup
+            self.settings.ship_speed = 5
+            self.settings.shot_delay = 200
         elif self.settings.alien_hor_speed < 20:
             self.speedup += 0.1
             self.settings.alien_hor_speed += self.speedup
+            self.settings.ship_speed = 8
+            self.settings.shot_delay = 150
         elif self.level == 20:
             self.settings.alien_hor_speed = 23
             self.settings.alien_ver_speed = 9
+            self.settings.ship_speed = 10
+            self.settings.shot_delay = 120
             
     def reset_stats(self):
         self.gameclass.settings.ships_left = 3
@@ -62,7 +68,7 @@ class Scoreboard:
 
         # значення швидкостей визначаються тут
         self.settings.alien_hor_speed = 10
-        self.settings.alien_ver_speed = 5
+        self.settings.alien_ver_speed = 2
 
         self.gameclass.menu._create_menus()
 

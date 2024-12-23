@@ -12,7 +12,7 @@ class Bullet(pygame.sprite.Sprite):
         self.ship = gameclass.ship.rect
 
         self.bullet_height = 5
-        self.bullet_width = 10
+        self.bullet_width = 20
         self.rect = pygame.Rect(0, 0,
                                 self.bullet_width, 
                                 self.bullet_height

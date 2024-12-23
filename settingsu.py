@@ -6,11 +6,11 @@ class Settings:
         self.screen_color = (0, 0, 0)
         self.framerate = 60
         
-        self.ship_speed = 1.5
+        self.ship_speed = 3
         self.ships_left = 3
 
         self.bullet_speed = 20
-        self.shot_delay = 100
+        self.shot_delay = 250
         self.bullet_color = (255, 0, 0)
 
         # фактичні значення швидкостей визначаються у бібліотеці scoreboarde.py
