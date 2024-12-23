@@ -10,6 +10,7 @@ class Scoreboard:
         self.game_paused = False
 
         self.alien_price = 100
+        self.shot_price = 5
 
         self.level = 1
         self.speedup = 1
@@ -17,11 +18,19 @@ class Scoreboard:
         self.score = 0
         self.high_score = 0
     
-    def update_score(self):
-        score = self.score + (self.alien_price * self.speedup)
-        self.score = round(int(score), -1)
-        if self.score > self.high_score:
-            self.high_score = self.score
+    def update_score(self, hit=False, miss=False):
+        if hit:
+            score = self.score + (self.alien_price * self.speedup)
+            self.score = round(int(score))
+            print('Score increased')
+            if self.score > self.high_score:
+                self.high_score = self.score
+        elif miss:
+            score = self.score - (self.shot_price * self.speedup)
+            self.score = round(int(score))
+            print('Score reduced')
+        else:
+            raise ValueError(f'hit={hit}, miss={miss}')
 
     def update_game_speed(self):
         self.level += 1

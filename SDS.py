@@ -73,7 +73,7 @@ class Game:
                 elif event.key == pygame.K_SPACE and not self.sb.game_paused:
                     mouse_pos = self.screen_rect.center
                     self.menu._button_press(mouse_pos)
-            case pygame.K_ESCAPE:
+            case pygame.K_ESCAPE | pygame.K_PAUSE | pygame.K_p:
                 self.menu.pause_game()
             case pygame.K_q:
                 sys.exit()
@@ -105,14 +105,17 @@ class Game:
         collision = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
         if collision:
             for kill in collision.values():
-                self.sb.update_score()
+                self.sb.update_score(hit=True)
                 self.menu._create_score()
                 self.menu._create_high_score()
                 
         self.bullets.update()
         for bullet in self.bullets.copy():
             if bullet.rect.left >= self.screen_rect.right:
+                self.sb.update_score(miss=True)
+                self.menu._create_score()
                 self.bullets.remove(bullet)
+                print('Bullet deleted')
 
     def _create_fleet(self):
         adam = Alien(self)

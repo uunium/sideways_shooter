@@ -16,6 +16,7 @@ class Menu:
         self._create_menus()
 
     def _button_press(self, mouse_pos):
+        # дії для початку гри
         if ((self.start_button.rect.collidepoint(mouse_pos) or 
             self.again_button.rect.collidepoint(mouse_pos)) and
             not self.sb.game_paused
@@ -25,6 +26,7 @@ class Menu:
             self.gameclass._create_fleet()
             self.gameclass.sb.reset_stats()
             self.gameclass.game_active = True
+        # дії для зняття паузи
         elif (self.resume_button.rect.collidepoint(mouse_pos) and 
             self.sb.game_paused):
             self.pause_game()
