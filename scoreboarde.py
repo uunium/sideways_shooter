@@ -16,7 +16,7 @@ class Scoreboard:
         self.speedup = 1
 
         self.score = 0
-        self.high_score = 0
+        self.high_score = self.gameclass.hsf[0]
     
     def update_score(self, hit=False, miss=False):
         if hit:
@@ -76,4 +76,20 @@ class Scoreboard:
         self.game_lost = False
         self.game_won = False
         self.game_paused = False
+
+    def save_hiscore(self):
+        if self.high_score > self.gameclass.hsf[0]:
+            self.gameclass.hsf.append(self.high_score)
+            self.gameclass.hsf.sort(reverse=True)
+        size = len(self.gameclass.hsf)
+        if size > 10:
+            dif = size - 10
+            for _ in range(dif):
+                self.gameclass.hsf.pop(10)
+
+        with open('highscore.py', 'w',) as hs_file:
+            hs_file.write(f'hiscore = {self.gameclass.hsf}')
+
+            
+
     

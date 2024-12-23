@@ -1,4 +1,5 @@
 from pygame.sprite import Group
+import sys
 
 from buttons import Button
 from shippe import Ship
@@ -126,3 +127,7 @@ class Menu:
         self._create_lives()
         self._game_lost()
         self._game_won()
+
+    def exit_game(self):
+        self.gameclass.sb.save_hiscore()
+        sys.exit()

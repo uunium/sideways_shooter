@@ -1,4 +1,4 @@
-import pygame, sys
+import pygame
 from time import sleep
 
 
@@ -8,6 +8,8 @@ from bullette import Bullet
 from alienne import Alien
 from menu import Menu
 from scoreboarde import Scoreboard
+from highscore import hiscore as hiscore_file
+
 
 # https://opengameart.org/content/space-9
 
@@ -20,10 +22,12 @@ class Game:
         self.settings = Settings(self)
         self.clock = pygame.time.Clock()
         self.timer = 0
+        self.hsf = hiscore_file
 
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height)
         )
+        pygame.display.set_caption('Sideways Alien Shooter')
         self.screen_rect = self.screen.get_rect()
         self.game_active = False
         self.background = pygame.image.load("./images/space.png").convert()
@@ -51,7 +55,7 @@ class Game:
         for event in pygame.event.get():
             match event.type:
                 case pygame.QUIT:
-                    sys.exit()
+                    self.menu.exit_game()
                 case pygame.KEYDOWN:
                     self._keydown_event(event)
                 case pygame.KEYUP:
@@ -76,7 +80,8 @@ class Game:
             case pygame.K_ESCAPE | pygame.K_PAUSE | pygame.K_p:
                 self.menu.pause_game()
             case pygame.K_q:
-                sys.exit()
+                self.menu.exit_game()
+
 
     def _keyup_event(self, event):
         match (event.key):
@@ -199,6 +204,7 @@ class Game:
             if self.sb.level == 21:
                 self.game_active = False
                 self.sb.game_won = True
+                self.sb.save_hiscore()
 
         self._check_collision()
         
