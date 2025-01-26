@@ -13,14 +13,17 @@ class Menu:
         self.screen_rect = gameclass.screen_rect
         self.settings = gameclass.settings
         self.sb = self.gameclass.sb
+        self.scores_list = []
 
         self._create_menus()
 
     def _button_press(self, mouse_pos):
         # дії для початку гри
-        if ((self.start_button.rect.collidepoint(mouse_pos) or 
-            self.again_button.rect.collidepoint(mouse_pos)) and
-            not self.sb.game_paused
+        if ((self.start_button.rect.collidepoint(mouse_pos) and not self.sb.game_paused 
+            and not self.sb.scores_active and not self.gameclass.game_active) 
+            or 
+            (self.again_button.rect.collidepoint(mouse_pos) and not self.sb.game_paused 
+            and not self.sb.scores_active and self.sb.game_won)
             ):
             self.gameclass.bullets.empty()
             self.gameclass.aliens.empty()
@@ -29,8 +32,15 @@ class Menu:
             self.gameclass.game_active = True
         # дії для зняття паузи
         elif (self.resume_button.rect.collidepoint(mouse_pos) and 
-            self.sb.game_paused):
+            self.sb.game_paused and not self.sb.scores_active and not self.gameclass.game_active):
             self.pause_game()
+        # access scores
+        elif (((self.scores_button.rect.collidepoint(mouse_pos) and not self.sb.game_paused and not self.gameclass.game_active)
+              or self.scores_button.rect.collidepoint(mouse_pos) and self.sb.game_paused and not self.gameclass.game_active)):
+            self.sb.scores_active = True
+        elif ((self.back_button.rect.collidepoint(mouse_pos) and not self.sb.game_paused and not self.gameclass.game_active)
+              or (self.back_button.rect.collidepoint(mouse_pos) and self.sb.game_paused and not self.gameclass.game_active)):
+            self.sb.scores_active = False
 
     def _create_high_score(self):
         self.hs = Button(
@@ -89,7 +99,7 @@ class Menu:
         self.chad_text.msg_rect.bottom = self.start_button.msg_rect.top - 10
 
     def pause_game(self):
-        '''Changes game_paused flag to appropriate one'''
+        '''Changes game_paused flag to an appropriate one'''
         if self.sb.game_paused and not self.gameclass.game_active:
             self.sb.game_paused = False
             self.gameclass.game_active = True
@@ -99,16 +109,25 @@ class Menu:
 
     def menu_logic(self):
         '''Decides which menu combo to show'''
-        if not self.sb.game_lost and not self.sb.game_won and not self.sb.game_paused:
+        if self.sb.scores_active:
+            self.highest_score.draw_button()
+            self.back_button.draw_button()
+            for score in self.scores_list:
+                score.draw_button()
+        elif not self.sb.game_lost and not self.sb.game_won and not self.sb.game_paused:
             self.start_button.draw_button()
+            self.scores_button.draw_button()
         elif self.sb.game_lost:
             self.again_button.draw_button()
             self.looser_text.draw_button()
+            self.scores_button.draw_button()
         elif self.sb.game_won:
             self.again_button.draw_button()
             self.chad_text.draw_button()
+            self.scores_button.draw_button()
         elif self.sb.game_paused:
             self.resume_button.draw_button()
+            self.scores_button.draw_button()
 
     def show_interface(self):
         self.hs.draw_button()
@@ -116,15 +135,56 @@ class Menu:
         self.level.draw_button()
         self.ship.draw(self.screen)
 
+    def create_scores_button(self):
+        '''Function to for score button creation. Used to create the button and move text lover'''
+        self.scores_button = Button(self.gameclass, 'Scores', bg_color=(145, 145, 145))
+        self.scores_button.rect.center = self.gameclass.screen_rect.center
+        self.scores_button.rect.y = self.scores_button.rect.y + 70
+        self.scores_button.msg_rect.center = self.scores_button.rect.center
+        
+    def show_scores(self):
+        '''Generates surfaces of Highest score to draw them on screen'''
+        # Create "Highest scores" string to crown scores
+        self.highest_score = Button(self.gameclass, 'Highest Scores', 80, bg_color=None,
+                                    height=0, width=0,)
+        self.highest_score.rect.centerx = self.screen_rect.centerx
+        self.highest_score.rect.y = 100
+        self.highest_score.msg_rect.center = self.highest_score.rect.center
+
+        # Create list of surfaces to show the score
+        self.scores_list.clear()
+        yval = self.highest_score.rect.bottom + 20
+        for score in self.gameclass.hsf:
+            yval += 50
+            score_text_button = Button(
+                self.gameclass, f'{self.gameclass.hsf.index(score) + 1}. {str(score)}', 
+                tx_size=60, bg_color=None, height=0, width=0,
+                )
+            score_text_button.rect.centerx = self.screen_rect.centerx
+            score_text_button.rect.y = yval
+            score_text_button.msg_rect.center = score_text_button.rect.center
+            yval += score_text_button.rect.height      
+            self.scores_list.append(score_text_button)
+
+        # Create back button
+        self.back_button = Button(self.gameclass, 'Back', bg_color=(145, 145, 145))
+        self.back_button.rect.centerx = self.screen_rect.centerx
+        self.back_button.rect.y = self.screen_rect.height - 100
+        self.back_button.msg_rect.center = self.back_button.rect.center
+        
     def _create_menus(self):
         self.start_button = Button(self.gameclass, 'Start', bg_color=(145, 145, 145))
         self.again_button = Button(self.gameclass, 'Play again', bg_color=(145, 145, 145))
         self.resume_button = Button(self.gameclass, 'Resume', bg_color=(145, 145, 145))
-                
+
+        self.create_scores_button()                
+        self.show_scores()
+
         self._create_high_score()
         self._create_score()
         self._create_level()
         self._create_lives()
+        
         self._game_lost()
         self._game_won()
 

@@ -8,6 +8,7 @@ class Scoreboard:
         self.game_lost = False
         self.game_won = False
         self.game_paused = False
+        self.scores_active = False
 
         self.alien_price = 100
         self.shot_price = 5
@@ -89,6 +90,8 @@ class Scoreboard:
 
         with open('highscore.py', 'w',) as hs_file:
             hs_file.write(f'hiscore = {self.gameclass.hsf}')
+    
+    
 
             
 
