@@ -6,6 +6,7 @@ class Ship(pygame.sprite.Sprite):
     def  __init__(self, gameclass) -> None:
         super().__init__()
         
+        self.gameclass = gameclass
         self.screen = gameclass.screen
         self.screen_rect = gameclass.screen_rect
         self.settings = gameclass.settings
@@ -27,6 +28,8 @@ class Ship(pygame.sprite.Sprite):
 
         self.y = float(self.rect.y)
 
+        self.boost_time = 0
+
     def moving(self):
         '''Move the ship up or down'''
 
@@ -41,10 +44,25 @@ class Ship(pygame.sprite.Sprite):
         self.rect.midleft = self.screen_rect.midleft
         self.y = float(self.rect.y)
 
-    
+    def _boost_ship(self):
+        self.settings.bb_speed = self.settings.ship_speed
+        self.boost_time = self.gameclass.timer
+        self.settings.ship_speed *= 3
+        self.settings.boost_active = True
+        print('Ship boosted')
+
+    def _deboost_ship(self):
+        if (self.settings.boost_active and 
+            self.gameclass.timer - self.boost_time >= self.settings.boost_duration
+            ):
+            self.settings.ship_speed = self.settings.bb_speed
+            self.settings.bb_speed = 0
+            self.settings.boost_active = False
+            print('Ship deboosted')
+
     def _update_ship(self):
         self.moving()
-
+        self._deboost_ship()
 
     def blitme(self):
         self.screen.blit(self.image, self.rect)

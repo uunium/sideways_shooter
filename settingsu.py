@@ -7,10 +7,14 @@ class Settings:
         self.framerate = 60
         
         self.ship_speed = 3
+        self.bb_speed = 0
         self.ships_left = 3
 
         self.bullet_speed = 20
         self.shot_delay = 250
+        self.boost_active = False
+        self.boost_duration = 250
+        self.boost_delay = 7000
         self.bullet_color = (255, 0, 0)
 
         # фактичні значення швидкостей визначаються у бібліотеці scoreboarde.py

@@ -77,12 +77,13 @@ class Game:
                 elif event.key == pygame.K_SPACE and not self.sb.game_paused:
                     mouse_pos = self.screen_rect.center
                     self.menu._button_press(mouse_pos)
+            case pygame.K_LSHIFT:
+                self.boost_ship()
             case pygame.K_ESCAPE | pygame.K_PAUSE | pygame.K_p:
                 self.menu.pause_game()
             case pygame.K_q:
                 self.menu.exit_game()
-
-
+            
     def _keyup_event(self, event):
         match (event.key):
             case pygame.K_UP | pygame.K_w:
@@ -191,6 +192,10 @@ class Game:
             print('Ship hit')
             self._ship_hit()
             self.menu._create_lives()
+
+    def boost_ship(self):
+        if self.timer - self.ship.boost_time >= self.settings.boost_delay:
+           self.ship._boost_ship() 
 
     def _update_aliens(self):
         self._fleet_check_borders()
