@@ -15,7 +15,7 @@ class Settings:
         self.boost_active = False
         self.boost_duration = 250
         self.boost_delay = 7000
-        self.bullet_color = (255, 0, 0)
+        self.mega_shot_delay = 10000
 
         # фактичні значення швидкостей визначаються у бібліотеці scoreboarde.py
         self.alien_hor_speed = 0

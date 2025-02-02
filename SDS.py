@@ -34,10 +34,12 @@ class Game:
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
         self.last_shot_time = 0
+        self.last_mega_shot_time = 0
         self.shoot_bullet_mod = False
         self.aliens = pygame.sprite.Group()
         self.sb = Scoreboard(self)
         self.menu = Menu(self)
+        self.mega_bullet = None
         self._create_fleet()
 
     def run_game(self):
@@ -79,6 +81,8 @@ class Game:
                     self.menu._button_press(mouse_pos)
             case pygame.K_LSHIFT:
                 self.boost_ship()
+            case pygame.K_LCTRL:
+                self.mega_shot()
             case pygame.K_ESCAPE | pygame.K_PAUSE | pygame.K_p:
                 self.menu.pause_game()
             case pygame.K_q:
@@ -102,26 +106,48 @@ class Game:
         self.bullets.add(new_bullet)
         print('Bullet shot')
 
+    def mega_shot(self):
+        '''Create mega bullet'''
+        if self.timer - self.last_mega_shot_time >= self.settings.mega_shot_delay:
+            self.last_mega_shot_time = self.timer
+            self.mega_bullet = Bullet(self)
+            self.mega_bullet.bullet_height *= 5
+            self.mega_bullet.bullet_width *= 5
+            self.mega_bullet.bullet_color =(0,255,0)
+            self.mega_bullet.generate_rect()
+            print('Mega bullet shot')
+         
     def _update_bullets(self):
         # Get time difference betwen shots to have aftofire every self.settings.shot_delay miliseconds
         shot_time_diff = pygame.time.get_ticks() - self.last_shot_time
         if self.shoot_bullet_mod and shot_time_diff >= self.settings.shot_delay:
             self.shoot_bullet()
             
+        # work with bullets    
         collision = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
         if collision:
             for kill in collision.values():
-                self.sb.update_score(hit=True)
-                self.menu._create_score()
-                self.menu._create_high_score()
-                
+                self.sb.bullet_hit(self.menu)
+               
         self.bullets.update()
+        
         for bullet in self.bullets.copy():
             if bullet.rect.left >= self.screen_rect.right:
-                self.sb.update_score(miss=True)
-                self.menu._create_score()
-                self.bullets.remove(bullet)
+                self.sb.bullet_missed(self.menu, bullet)
                 print('Bullet deleted')
+
+        # work with Mega Shot if it is alive
+        if self.mega_bullet is not None:
+
+            mega_collision = pygame.sprite.spritecollide(self.mega_bullet, self.aliens, True)
+            if mega_collision:
+                for kill in mega_collision:
+                    self.sb.bullet_hit(self.menu)
+
+            self.mega_bullet.update()                   
+            
+            if self.mega_bullet.rect.left >= self.screen_rect.right:
+                self.mega_bullet = None 
 
     def _create_fleet(self):
         adam = Alien(self)
@@ -223,6 +249,8 @@ class Game:
             self.menu.menu_logic()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+        if self.mega_bullet is not None:
+            self.mega_bullet.draw_bullet()
         pygame.display.flip()
 
     def _blit_background(self):

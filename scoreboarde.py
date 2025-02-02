@@ -4,6 +4,7 @@ class Scoreboard:
         self.screen = gameclass.screen
         self.screen_rect = gameclass.screen_rect
         self.settings = gameclass.settings
+        self.bullets = gameclass.bullets
 
         self.game_lost = False
         self.game_won = False
@@ -59,7 +60,19 @@ class Scoreboard:
             self.settings.alien_ver_speed = 9
             self.settings.ship_speed = 10
             self.settings.shot_delay = 120
-            
+
+    def bullet_hit(self, menu):
+        self.update_score(hit=True)
+        menu._create_score()
+        menu._create_high_score()
+
+    def bullet_missed(self, menu, bullet=None):
+        self.update_score(miss=True)
+        menu._create_score()
+        if bullet is not None:
+            self.bullets.remove(bullet)
+                
+
     def reset_stats(self):
         self.gameclass.settings.ships_left = 3
         self.alien_price = 100
