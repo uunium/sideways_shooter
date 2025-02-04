@@ -8,11 +8,14 @@ from bullette import Bullet
 from alienne import Alien
 from menu import Menu
 from scoreboarde import Scoreboard
+from bar_timer import Timer
 from highscore import hiscore as hiscore_file
 
 
 # https://opengameart.org/content/space-9
-
+# https://opengameart.org/content/sleek-bars
+# https://opengameart.org/content/ship-space-0
+# https://opengameart.org/content/space-shooter-top-down-2d-pixel-art
 
 class Game:
 
@@ -40,6 +43,19 @@ class Game:
         self.sb = Scoreboard(self)
         self.menu = Menu(self)
         self.mega_bullet = None
+
+        self.mega_shot_bar = Timer(
+            self, (0,255,0), action_time=self.last_mega_shot_time, 
+            delay=self.settings.mega_shot_delay, 
+            x=(self.screen_rect.width - 136), y=(self.screen_rect.height - 100),
+        )
+
+        self.boost_bar = Timer(
+            self, (0,153,255), action_time=self.ship.boost_time, 
+            delay=self.settings.boost_delay, 
+            x=(self.screen_rect.width - 136), y=(self.screen_rect.height - 150),
+        )
+
         self._create_fleet()
 
     def run_game(self):
@@ -115,6 +131,7 @@ class Game:
             self.mega_bullet.bullet_width *= 5
             self.mega_bullet.bullet_color =(0,255,0)
             self.mega_bullet.generate_rect()
+            self.mega_shot_bar.reset_bar(self.last_mega_shot_time)
             print('Mega bullet shot')
          
     def _update_bullets(self):
@@ -221,7 +238,8 @@ class Game:
 
     def boost_ship(self):
         if self.timer - self.ship.boost_time >= self.settings.boost_delay:
-           self.ship._boost_ship() 
+           self.ship._boost_ship()
+           self.boost_bar.reset_bar(self.ship.boost_time) 
 
     def _update_aliens(self):
         self._fleet_check_borders()
@@ -245,6 +263,9 @@ class Game:
         self.ship.blitme()
         self.aliens.draw(self.screen)
         self.menu.show_interface()
+        self.mega_shot_bar.blit_bar()
+        self.boost_bar.blit_bar()
+        
         if not self.game_active:
             self.menu.menu_logic()
         for bullet in self.bullets.sprites():

@@ -60,7 +60,8 @@ class Scoreboard:
             self.settings.alien_ver_speed = 9
             self.settings.ship_speed = 10
             self.settings.shot_delay = 120
-
+            
+    # need to remove 'menu' parameter from here somehow
     def bullet_hit(self, menu):
         self.update_score(hit=True)
         menu._create_score()
