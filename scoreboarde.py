@@ -19,20 +19,20 @@ class Scoreboard:
 
         self.score = 0
         self.high_score = self.gameclass.hsf[0]
-    
+
     def update_score(self, hit=False, miss=False):
         if hit:
             score = self.score + (self.alien_price * self.speedup)
             self.score = round(int(score))
-            print('Score increased')
+            print("Score increased")
             if self.score > self.high_score:
                 self.high_score = self.score
         elif miss:
             score = self.score - (self.shot_price * self.speedup)
             self.score = round(int(score))
-            print('Score reduced')
+            print("Score reduced")
         else:
-            raise ValueError(f'hit={hit}, miss={miss}')
+            raise ValueError(f"hit={hit}, miss={miss}")
 
     def update_game_speed(self):
         self.level += 1
@@ -44,10 +44,9 @@ class Scoreboard:
         if self.settings.alien_hor_speed < 15:
             self.speedup += 0.05
             self.settings.alien_hor_speed += self.speedup
-        elif (self.settings.alien_hor_speed > 15 and 
-              self.settings.alien_ver_speed < 7):
+        elif self.settings.alien_hor_speed > 15 and self.settings.alien_ver_speed < 7:
             self.speedup += 0.5
-            self.settings.alien_ver_speed +=  self.speedup
+            self.settings.alien_ver_speed += self.speedup
             self.settings.ship_speed = 5
             self.settings.shot_delay = 200
         elif self.settings.alien_hor_speed < 20:
@@ -60,7 +59,7 @@ class Scoreboard:
             self.settings.alien_ver_speed = 9
             self.settings.ship_speed = 10
             self.settings.shot_delay = 120
-            
+
     # need to remove 'menu' parameter from here somehow
     def bullet_hit(self, menu):
         self.update_score(hit=True)
@@ -72,7 +71,6 @@ class Scoreboard:
         menu._create_score()
         if bullet is not None:
             self.bullets.remove(bullet)
-                
 
     def reset_stats(self):
         self.gameclass.settings.ships_left = 3
@@ -102,11 +100,8 @@ class Scoreboard:
             for _ in range(dif):
                 self.gameclass.hsf.pop(10)
 
-        with open('highscore.py', 'w',) as hs_file:
-            hs_file.write(f'hiscore = {self.gameclass.hsf}')
-    
-    
-
-            
-
-    
+        with open(
+            "highscore.py",
+            "w",
+        ) as hs_file:
+            hs_file.write(f"hiscore = {self.gameclass.hsf}")

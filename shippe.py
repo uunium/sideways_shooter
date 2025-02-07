@@ -3,22 +3,22 @@ import pygame
 
 class Ship(pygame.sprite.Sprite):
 
-    def  __init__(self, gameclass) -> None:
+    def __init__(self, gameclass) -> None:
         super().__init__()
-        
+
         self.gameclass = gameclass
         self.screen = gameclass.screen
         self.screen_rect = gameclass.screen_rect
         self.settings = gameclass.settings
 
-        self.ship_path = 'images/White_Ship_Space.png'
+        self.ship_path = "images/White_Ship_Space.png"
 
         # load image as surface and rotate it 90 degrees clockwise, and
         # scale it 20%
         self.image = pygame.image.load(self.ship_path).convert_alpha()
         self.image = pygame.transform.rotate(self.image, -90)
         self.image = pygame.transform.scale_by(self.image, 1.5)
-        
+
         self.rect = self.image.get_rect()
 
         self.rect.midleft = self.screen_rect.midleft
@@ -31,7 +31,7 @@ class Ship(pygame.sprite.Sprite):
         self.boost_time = 0
 
     def moving(self):
-        '''Move the ship up or down'''
+        """Move the ship up or down"""
 
         if self.move_up and self.rect.top > 0:
             self.y -= self.settings.ship_speed
@@ -49,16 +49,17 @@ class Ship(pygame.sprite.Sprite):
         self.boost_time = self.gameclass.timer
         self.settings.ship_speed *= 3
         self.settings.boost_active = True
-        print('Ship boosted')
+        print("Ship boosted")
 
     def _deboost_ship(self):
-        if (self.settings.boost_active and 
-            self.gameclass.timer - self.boost_time >= self.settings.boost_duration
-            ):
+        if (
+            self.settings.boost_active
+            and self.gameclass.timer - self.boost_time >= self.settings.boost_duration
+        ):
             self.settings.ship_speed = self.settings.bb_speed
             self.settings.bb_speed = 0
             self.settings.boost_active = False
-            print('Ship deboosted')
+            print("Ship deboosted")
 
     def _update_ship(self):
         self.moving()

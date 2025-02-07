@@ -1,11 +1,11 @@
 class Settings:
-    def __init__(self,gameclass) -> None:
+    def __init__(self, gameclass) -> None:
         self.gameclass = gameclass
         self.screen_width = 1280
         self.screen_height = 720
         self.screen_color = (0, 0, 0)
         self.framerate = 60
-        
+
         self.ship_speed = 3
         self.bb_speed = 0
         self.ships_left = 3
@@ -23,5 +23,3 @@ class Settings:
 
         # direction should be 1 or -1
         self.alien_direction = -1
-
-

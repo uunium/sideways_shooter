@@ -17,6 +17,7 @@ from highscore import hiscore as hiscore_file
 # https://opengameart.org/content/ship-space-0
 # https://opengameart.org/content/space-shooter-top-down-2d-pixel-art
 
+
 class Game:
 
     def __init__(self) -> None:
@@ -26,11 +27,11 @@ class Game:
         self.clock = pygame.time.Clock()
         self.timer = 0
         self.hsf = hiscore_file
-        
+
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height)
         )
-        pygame.display.set_caption('Sideways Alien Shooter')
+        pygame.display.set_caption("Sideways Alien Shooter")
         self.screen_rect = self.screen.get_rect()
         self.game_active = False
         self.background = pygame.image.load("./images/space.png").convert()
@@ -45,15 +46,21 @@ class Game:
         self.mega_bullet = None
 
         self.mega_shot_bar = Timer(
-            self, (0,255,0), action_time=self.last_mega_shot_time, 
-            delay=self.settings.mega_shot_delay, 
-            x=(self.screen_rect.width - 136), y=(self.screen_rect.height - 100),
+            self,
+            (0, 255, 0),
+            action_time=self.last_mega_shot_time,
+            delay=self.settings.mega_shot_delay,
+            x=(self.screen_rect.width - 136),
+            y=(self.screen_rect.height - 100),
         )
 
         self.boost_bar = Timer(
-            self, (0,153,255), action_time=self.ship.boost_time, 
-            delay=self.settings.boost_delay, 
-            x=(self.screen_rect.width - 136), y=(self.screen_rect.height - 150),
+            self,
+            (0, 153, 255),
+            action_time=self.ship.boost_time,
+            delay=self.settings.boost_delay,
+            x=(self.screen_rect.width - 136),
+            y=(self.screen_rect.height - 150),
         )
 
         self._create_fleet()
@@ -81,7 +88,7 @@ class Game:
                 case pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
                     self.menu._button_press(mouse_pos)
-                
+
     def _keydown_event(self, event):
         match (event.key):
             case pygame.K_UP | pygame.K_w:
@@ -103,7 +110,7 @@ class Game:
                 self.menu.pause_game()
             case pygame.K_q:
                 self.menu.exit_game()
-            
+
     def _keyup_event(self, event):
         match (event.key):
             case pygame.K_UP | pygame.K_w:
@@ -111,60 +118,62 @@ class Game:
             case pygame.K_DOWN | pygame.K_s:
                 self.ship.move_down = False
             case pygame.K_SPACE:
-                    if self.game_active:
-                        self.shoot_bullet_mod = False
+                if self.game_active:
+                    self.shoot_bullet_mod = False
 
     def shoot_bullet(self):
-        '''Create a bullet instance and draw it,
-        also save the time of the shot'''
+        """Create a bullet instance and draw it,
+        also save the time of the shot"""
         self.last_shot_time = pygame.time.get_ticks()
         new_bullet = Bullet(self)
         self.bullets.add(new_bullet)
-        print('Bullet shot')
+        print("Bullet shot")
 
     def mega_shot(self):
-        '''Create mega bullet'''
+        """Create mega bullet"""
         if self.timer - self.last_mega_shot_time >= self.settings.mega_shot_delay:
             self.last_mega_shot_time = self.timer
             self.mega_bullet = Bullet(self)
             self.mega_bullet.bullet_height *= 5
             self.mega_bullet.bullet_width *= 5
-            self.mega_bullet.bullet_color =(0,255,0)
+            self.mega_bullet.bullet_color = (0, 255, 0)
             self.mega_bullet.generate_rect()
             self.mega_shot_bar.reset_bar(self.last_mega_shot_time)
-            print('Mega bullet shot')
-         
+            print("Mega bullet shot")
+
     def _update_bullets(self):
         # Get time difference betwen shots to have aftofire every self.settings.shot_delay miliseconds
         shot_time_diff = pygame.time.get_ticks() - self.last_shot_time
         if self.shoot_bullet_mod and shot_time_diff >= self.settings.shot_delay:
             self.shoot_bullet()
-            
-        # work with bullets    
+
+        # work with bullets
         collision = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
         if collision:
             for kill in collision.values():
                 self.sb.bullet_hit(self.menu)
-               
+
         self.bullets.update()
-        
+
         for bullet in self.bullets.copy():
             if bullet.rect.left >= self.screen_rect.right:
                 self.sb.bullet_missed(self.menu, bullet)
-                print('Bullet deleted')
+                print("Bullet deleted")
 
         # work with Mega Shot if it is alive
         if self.mega_bullet is not None:
 
-            mega_collision = pygame.sprite.spritecollide(self.mega_bullet, self.aliens, True)
+            mega_collision = pygame.sprite.spritecollide(
+                self.mega_bullet, self.aliens, True
+            )
             if mega_collision:
                 for kill in mega_collision:
                     self.sb.bullet_hit(self.menu)
 
-            self.mega_bullet.update()                   
-            
+            self.mega_bullet.update()
+
             if self.mega_bullet.rect.left >= self.screen_rect.right:
-                self.mega_bullet = None 
+                self.mega_bullet = None
 
     def _create_fleet(self):
         adam = Alien(self)
@@ -195,7 +204,7 @@ class Game:
     def _fleet_check_earth_contact(self):
         for alien in self.aliens.sprites():
             if alien.rect.left <= 0:
-                print('Earth reached')
+                print("Earth reached")
                 self._ship_hit()
                 break
 
@@ -207,7 +216,7 @@ class Game:
     #             self.settings.alien_movement_counter = 0
 
     # def _save_ver_speed(self):
-    #     '''used to save current movement speed of the ship and 
+    #     '''used to save current movement speed of the ship and
     #     nulify it for smooth alien movement'''
     #     if self.settings.alien_ver_speed != 0:
     #         self._previous_ver_speed = self.settings.alien_ver_speed
@@ -215,31 +224,31 @@ class Game:
     #         print('Border reached')
 
     def _ship_hit(self):
-        if self.settings.ships_left  > 1:
+        if self.settings.ships_left > 1:
             self.settings.ships_left -= 1
             sleep(0.5)
             self.aliens.empty()
             self.bullets.empty()
             self.ship._center_ship()
             self._create_fleet()
-            
-            '''_create_lives має бути тут аби оновлювати кількість життів після 
-            кожного контакту з прибульцями'''
+
+            """_create_lives має бути тут аби оновлювати кількість життів після 
+            кожного контакту з прибульцями"""
             self.menu._create_lives()
         else:
             self.game_active = False
             self.sb.game_lost = True
-            
+
     def _check_collision(self):
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
-            print('Ship hit')
+            print("Ship hit")
             self._ship_hit()
             self.menu._create_lives()
 
     def boost_ship(self):
         if self.timer - self.ship.boost_time >= self.settings.boost_delay:
-           self.ship._boost_ship()
-           self.boost_bar.reset_bar(self.ship.boost_time) 
+            self.ship._boost_ship()
+            self.boost_bar.reset_bar(self.ship.boost_time)
 
     def _update_aliens(self):
         self._fleet_check_borders()
@@ -256,7 +265,7 @@ class Game:
                 self.sb.save_hiscore()
 
         self._check_collision()
-        
+
     def _update_screen(self):
         self.clock.tick(self.settings.framerate)
         self._blit_background()
@@ -265,7 +274,7 @@ class Game:
         self.menu.show_interface()
         self.mega_shot_bar.blit_bar()
         self.boost_bar.blit_bar()
-        
+
         if not self.game_active:
             self.menu.menu_logic()
         for bullet in self.bullets.sprites():

@@ -2,7 +2,7 @@ import pygame
 
 
 class Alien(pygame.sprite.Sprite):
-    
+
     def __init__(self, gameclass) -> None:
         super().__init__()
 
@@ -11,7 +11,7 @@ class Alien(pygame.sprite.Sprite):
         self.settings = gameclass.settings
         self.ship = gameclass.ship.rect
 
-        image_path = 'images/alien.png'
+        image_path = "images/alien.png"
         self.image = pygame.image.load(image_path).convert_alpha()
         self.rect = self.image.get_rect()
 
