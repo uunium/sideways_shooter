@@ -10,6 +10,7 @@ class Scoreboard:
         self.game_won = False
         self.game_paused = False
         self.scores_active = False
+        self.controls_active = False
 
         self.alien_price = 100
         self.shot_price = 5
@@ -23,13 +24,13 @@ class Scoreboard:
     def update_score(self, hit=False, miss=False):
         if hit:
             score = self.score + (self.alien_price * self.speedup)
-            self.score = round(int(score))
+            self.score = round(score)
             print("Score increased")
             if self.score > self.high_score:
                 self.high_score = self.score
         elif miss:
             score = self.score - (self.shot_price * self.speedup)
-            self.score = round(int(score))
+            self.score = round(score)
             print("Score reduced")
         else:
             raise ValueError(f"hit={hit}, miss={miss}")
@@ -89,6 +90,7 @@ class Scoreboard:
         self.game_lost = False
         self.game_won = False
         self.game_paused = False
+        self.controls_active = False
 
     def save_hiscore(self):
         if self.high_score > self.gameclass.hsf[0]:
