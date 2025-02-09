@@ -275,12 +275,12 @@ class Game:
         self.mega_shot_bar.blit_bar()
         self.boost_bar.blit_bar()
 
-        if not self.game_active:
-            self.menu.menu_logic()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
         if self.mega_bullet is not None:
             self.mega_bullet.draw_bullet()
+        if not self.game_active:
+            self.menu.menu_logic()
         pygame.display.flip()
 
     def _blit_background(self):
