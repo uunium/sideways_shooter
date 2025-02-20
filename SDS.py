@@ -99,15 +99,17 @@ class Game:
                 if self.game_active:
                     self.shoot_bullet()
                     self.shoot_bullet_mod = True
-                elif event.key == pygame.K_SPACE and not self.sb.game_paused:
-                    mouse_pos = self.screen_rect.center
-                    self.menu._button_press(mouse_pos)
+                elif event.key == pygame.K_SPACE and self.sb.game_state != "Pause":
+                    self.menu._button_press(self.menu.start_button.rect.center)
             case pygame.K_LSHIFT:
                 self.boost_ship()
             case pygame.K_LCTRL:
                 self.mega_shot()
             case pygame.K_ESCAPE | pygame.K_PAUSE | pygame.K_p:
-                self.menu.pause_game()
+                if self.sb.game_state == "Start":
+                    self.menu._button_press(self.menu.start_button.rect.center)
+                else:
+                    self.menu.pause_game()
             case pygame.K_q:
                 self.menu.exit_game()
 
@@ -237,7 +239,7 @@ class Game:
             self.menu._create_lives()
         else:
             self.game_active = False
-            self.sb.game_lost = True
+            self.sb.game_state = "Fail"
 
     def _check_collision(self):
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
@@ -261,10 +263,15 @@ class Game:
             self.sb.update_game_speed()
             if self.sb.level == 21:
                 self.game_active = False
-                self.sb.game_won = True
+                self.sb.game_state = "Win"
                 self.sb.save_hiscore()
 
         self._check_collision()
+
+    def _blit_background(self):
+        for y in range(0, self.screen.get_height(), self.background.get_height()):
+            for x in range(0, self.screen.get_width(), self.background.get_width()):
+                self.screen.blit(self.background, (x, y))
 
     def _update_screen(self):
         self.clock.tick(self.settings.framerate)
@@ -280,13 +287,8 @@ class Game:
         if self.mega_bullet is not None:
             self.mega_bullet.draw_bullet()
         if not self.game_active:
-            self.menu.menu_logic()
+            self.menu.choose_state()
         pygame.display.flip()
-
-    def _blit_background(self):
-        for y in range(0, self.screen.get_height(), self.background.get_height()):
-            for x in range(0, self.screen.get_width(), self.background.get_width()):
-                self.screen.blit(self.background, (x, y))
 
 
 if __name__ == "__main__":

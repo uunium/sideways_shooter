@@ -6,11 +6,7 @@ class Scoreboard:
         self.settings = gameclass.settings
         self.bullets = gameclass.bullets
 
-        self.game_lost = False
-        self.game_won = False
-        self.game_paused = False
-        self.scores_active = False
-        self.controls_active = False
+        self.game_state = "Start"
 
         self.alien_price = 100
         self.shot_price = 5
@@ -89,8 +85,6 @@ class Scoreboard:
         self.gameclass.shoot_bullet_mod = False
         self.game_lost = False
         self.game_won = False
-        self.game_paused = False
-        self.controls_active = False
 
     def save_hiscore(self):
         if self.high_score > self.gameclass.hsf[0]:

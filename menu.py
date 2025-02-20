@@ -14,69 +14,41 @@ class Menu:
         self.settings = gameclass.settings
         self.sb = self.gameclass.sb
         self.scores_list = []
+        self.prev_state = "Start"
+        self.highest_score = None
 
+        # buttons initialized
         self._create_menus()
+        # game states dcit created
+
 
     def _button_press(self, mouse_pos):
         # дії для початку гри
-        if (
-            self.start_button.rect.collidepoint(mouse_pos)
-            and not self.sb.game_paused
-            and not self.sb.scores_active
-            and not self.gameclass.game_active
-        ) or (
-            self.again_button.rect.collidepoint(mouse_pos)
-            and not self.sb.game_paused
-            and not self.sb.scores_active
-            and self.sb.game_won
-        ):
-            self.gameclass.bullets.empty()
-            self.gameclass.aliens.empty()
-            self.gameclass._create_fleet()
-            self.gameclass.sb.reset_stats()
-            self.gameclass.game_active = True
-        # дії для зняття паузи
-        elif (
-            self.resume_button.rect.collidepoint(mouse_pos)
-            and self.sb.game_paused
-            and not self.sb.scores_active
-            and not self.gameclass.game_active
-        ):
-            self.pause_game()
-        # access scores
-        elif (
-            (
-                self.scores_button.rect.collidepoint(mouse_pos)
-                and not self.sb.game_paused
-                and not self.gameclass.game_active
-            )
-            or self.scores_button.rect.collidepoint(mouse_pos)
-            and self.sb.game_paused
-            and not self.gameclass.game_active
-        ):
-            self.sb.scores_active = True
-        elif (
-            (
-                self.controls_button.rect.collidepoint(mouse_pos)
-                and not self.sb.game_paused
-                and not self.gameclass.game_active
-            )
-            or self.controls_button.rect.collidepoint(mouse_pos)
-            and self.sb.game_paused
-            and not self.gameclass.game_active
-        ):
-            self.sb.controls_active = True
-        elif (
-            self.back_button.rect.collidepoint(mouse_pos)
-            and not self.sb.game_paused
-            and not self.gameclass.game_active
-        ) or (
-            self.back_button.rect.collidepoint(mouse_pos)
-            and self.sb.game_paused
-            and not self.gameclass.game_active
-        ):
-            self.sb.scores_active = False
-            self.sb.controls_active = False
+        if not self.gameclass.game_active:    
+            print("Button before", self.start_button.rect)
+            if  self.start_button.rect.collidepoint(mouse_pos) and self.start_button.rect.x != -1000:
+                
+                self.gameclass.bullets.empty()
+                self.gameclass.aliens.empty()
+                self.gameclass._create_fleet()
+                self.gameclass.sb.reset_stats()
+                self.gameclass.game_active = True
+                self.sb.game_state = "Game Active"
+                print(f"Start Button clicked: {self.start_button.rect}")
+
+            # дії для зняття паузи
+            elif self.resume_button.rect.collidepoint(mouse_pos):
+                self.pause_game()
+            # access scores
+            elif self.scores_button.rect.collidepoint(mouse_pos):
+                self.prev_state = self.sb.game_state
+                self.sb.game_state = "Scores"
+            elif self.controls_button.rect.collidepoint(mouse_pos):
+                self.prev_state = self.sb.game_state
+                self.sb.game_state = "Controls"
+            elif self.back_button.rect.collidepoint(mouse_pos):
+                # think on how back button will work
+                    self.sb.game_state = self.prev_state
 
     def _create_high_score(self):
         self.hs = Button(
@@ -128,6 +100,56 @@ class Menu:
             ship.rect.y = self.screen_rect.height - 10 - ship.rect.height
             self.ship.add(ship)
 
+    def create_resume_button(self):    
+        self.resume_button = Button(self.gameclass, "Resume", bg_color=(145, 145, 145), name= "Resume")
+        self.resume_button.rect.y -= 70
+        self.resume_button.msg_rect.center = self.resume_button.rect.center
+
+    def create_scores_button(self):
+        """Function to for score button creation. Used to create the button and move text lover"""
+        self.scores_button = Button(self.gameclass, "Scores", bg_color=(145, 145, 145), name="Scores")
+        self.scores_button.rect.y = self.scores_button.rect.y + 70
+        self.scores_button.msg_rect.center = self.scores_button.rect.center
+    
+    def create_controls_button(self):
+        """Function to for score button creation. Used to create the button and move text lover"""
+        self.controls_button = Button(self.gameclass, "Controls", bg_color=(145, 145, 145), name="Controls")
+        self.controls_button.rect.y = self.controls_button.rect.y + 140
+        self.controls_button.msg_rect.center = self.controls_button.rect.center
+
+    def create_back_button(self):
+        # Create back button
+        self.back_button = Button(self.gameclass, "Back", bg_color=(145, 145, 145), name="Back")
+        self.back_button.rect.y = self.screen_rect.height - 100
+        self.back_button.msg_rect.center = self.back_button.rect.center
+
+    def _create_menus(self):
+        self.start_button = Button(self.gameclass, "New game", bg_color=(145, 145, 145), name="Start")
+
+        self.create_resume_button()
+        self.create_scores_button()
+        self.create_controls_button()
+        self.create_back_button()
+
+        self._create_high_score()
+        self._create_score()
+        self._create_level()
+        self._create_lives()
+
+        self._game_lost()
+        self._game_won()
+
+        self.game_states = {
+            "Start": (self.start_button, self.scores_button, self.controls_button),
+            "Pause": (self.resume_button, self.start_button, self.scores_button, self.controls_button),
+            "Scores": (self.show_scores, self.back_button),
+            "Controls": (self.show_controls, self.back_button),
+            "Win": (self._game_won, self.chad_text, self.start_button, self.scores_button, self.controls_button),
+            "Fail": (self._game_lost, self.looser_text, self.start_button, self.scores_button, self.controls_button),
+            "Buttons": (self.start_button, self.scores_button, self.controls_button, self.resume_button, self.back_button,),
+            "Game Active": None,
+        }
+
     def _game_lost(self):
         """Text to render when player looses the game"""
         self.looser_text = Button(
@@ -155,68 +177,26 @@ class Menu:
         self.chad_text.msg_rect.bottom = self.start_button.msg_rect.top - 10
 
     def pause_game(self):
-        """Changes game_paused flag to an appropriate one"""
-        if (self.sb.game_paused
-            and not self.gameclass.game_active 
-            and not self.sb.scores_active
-            and not self.sb.controls_active
-        ):
-            self.sb.game_paused = False
-            self.gameclass.game_active = True
-        elif(
-            self.sb.game_paused
-            and not self.gameclass.game_active
-            and (self.sb.scores_active or self.sb.controls_active)
-        ):
-            self.sb.game_paused = False
-            self.gameclass.game_active = True
-            self.sb.scores_active = False
-            self.sb.controls_active = False
-        elif self.gameclass.game_active and not self.sb.game_paused:
-            self.sb.game_paused = True
+        """
+        Changes game_paused flag to an appropriate one
+        Hides or shows buttons depending on game_active flag
+        """
+        if  self.gameclass.game_active:
             self.gameclass.game_active = False
             self.gameclass.shoot_bullet_mod = False
+            self.sb.game_state = "Pause"
+        elif not self.gameclass.game_active and self.sb.game_state == "Pause":
+            self.sb.game_state = "Game Active"
+            self.gameclass.game_active = True
+            
 
-    def create_controls_button(self):
-        """Function to for score button creation. Used to create the button and move text lover"""
-        self.controls_button = Button(self.gameclass, "Controls", bg_color=(145, 145, 145))
-        self.controls_button.rect.center = self.gameclass.screen_rect.center
-        self.controls_button.rect.y = self.controls_button.rect.y + 140
-        self.controls_button.msg_rect.center = self.controls_button.rect.center
+    def show_controls(self):
+        if self.prev_state != "Controls":
+            self.controls_image = pygame.image.load('./images/controls.png').convert_alpha()
+            self.controls_image_rect = self.controls_image.get_rect()
+            self.controls_image_rect.center = self.screen_rect.center
 
-    def _controls_menu(self):
-        image = pygame.image.load('./images/controls.png').convert_alpha()
-        image_rect = image.get_rect()
-        image_rect.center = self.screen_rect.center
-        
-        self.screen.blit(image, image_rect)
-
-    def menu_logic(self):
-        """Decides which menu combo to show"""
-        if self.sb.scores_active:
-            self.highest_score.draw_button()
-            self.back_button.draw_button()
-            for score in self.scores_list:
-                score.draw_button()
-        elif self.sb.controls_active:
-            self._controls_menu()
-            self.back_button.draw_button()
-        elif not self.sb.game_lost and not self.sb.game_won and not self.sb.game_paused:
-            self.start_button.draw_button()
-            self.scores_button.draw_button()
-            self.controls_button.draw_button()
-        elif self.sb.game_lost:
-            self.again_button.draw_button()
-            self.looser_text.draw_button()
-            self.scores_button.draw_button()
-        elif self.sb.game_won:
-            self.again_button.draw_button()
-            self.chad_text.draw_button()
-            self.scores_button.draw_button()
-        elif self.sb.game_paused:
-            self.resume_button.draw_button()
-            self.scores_button.draw_button()
-            self.controls_button.draw_button()
+        self.screen.blit(self.controls_image, self.controls_image_rect)
 
     def show_interface(self):
         self.hs.draw_button()
@@ -224,72 +204,108 @@ class Menu:
         self.level.draw_button()
         self.ship.draw(self.screen)
 
-    def create_scores_button(self):
-        """Function to for score button creation. Used to create the button and move text lover"""
-        self.scores_button = Button(self.gameclass, "Scores", bg_color=(145, 145, 145))
-        self.scores_button.rect.center = self.gameclass.screen_rect.center
-        self.scores_button.rect.y = self.scores_button.rect.y + 70
-        self.scores_button.msg_rect.center = self.scores_button.rect.center
-
     def show_scores(self):
         """Generates surfaces of Highest score to draw them on screen"""
         # Create "Highest scores" string to crown scores
-        self.highest_score = Button(
-            self.gameclass,
-            "Highest Scores",
-            80,
-            bg_color=None,
-            height=0,
-            width=0,
-        )
-        self.highest_score.rect.centerx = self.screen_rect.centerx
-        self.highest_score.rect.y = 100
-        self.highest_score.msg_rect.center = self.highest_score.rect.center
-
-        # Create list of surfaces to show the score
-        self.scores_list.clear()
-        yval = self.highest_score.rect.bottom + 20
-        for score in self.gameclass.hsf:
-            yval += 50
-            score_text_button = Button(
+        if not self.highest_score:  
+            self.highest_score = Button(
                 self.gameclass,
-                f"{self.gameclass.hsf.index(score) + 1}. {str(score)}",
-                tx_size=60,
+                "Highest Scores",
+                80,
                 bg_color=None,
                 height=0,
                 width=0,
             )
-            score_text_button.rect.centerx = self.screen_rect.centerx
-            score_text_button.rect.y = yval
-            score_text_button.msg_rect.center = score_text_button.rect.center
-            yval += score_text_button.rect.height
-            self.scores_list.append(score_text_button)
+            self.highest_score.rect.centerx = self.screen_rect.centerx
+            self.highest_score.rect.y = 100
+            self.highest_score.msg_rect.center = self.highest_score.rect.center
 
-        # Create back button
-        self.back_button = Button(self.gameclass, "Back", bg_color=(145, 145, 145))
-        self.back_button.rect.centerx = self.screen_rect.centerx
-        self.back_button.rect.y = self.screen_rect.height - 100
-        self.back_button.msg_rect.center = self.back_button.rect.center
+            # Create list of surfaces to show the score
+            self.scores_list.clear()
+            yval = self.highest_score.rect.bottom + 20
+            for score in self.gameclass.hsf:
+                yval += 50
+                score_text_button = Button(
+                    self.gameclass,
+                    f"{self.gameclass.hsf.index(score) + 1}. {str(score)}",
+                    tx_size=60,
+                    bg_color=None,
+                    height=0,
+                    width=0,
+                )
+                score_text_button.rect.centerx = self.screen_rect.centerx
+                score_text_button.rect.y = yval
+                score_text_button.msg_rect.center = score_text_button.rect.center
+                yval += score_text_button.rect.height
+                self.scores_list.append(score_text_button)
 
-    def _create_menus(self):
-        self.start_button = Button(self.gameclass, "Start", bg_color=(145, 145, 145))
-        self.again_button = Button(
-            self.gameclass, "Play again", bg_color=(145, 145, 145)
-        )
-        self.resume_button = Button(self.gameclass, "Resume", bg_color=(145, 145, 145))
+        self.highest_score.draw_button()
+        for score in self.scores_list:
+            score.draw_button()
 
-        self.create_scores_button()
-        self.create_controls_button()
-        self.show_scores()
+    def screen_state(self, state:str):
+        print(state)
+        if self.sb.game_state != "Game Active":
+            for _button in self.game_states["Buttons"]:
+                if _button not in self.game_states[state] and _button.rect.x != -1000:
+                    _button.save_button_loc()
+                    _button.hide_button()
+                    print(f"Hidden button: {_button.name}, Rect: {_button.rect}")
+            for button in self.game_states[state]:
+                if callable(button):
+                    button()
+                elif isinstance(button, Button):
+                    button.show_button()
+                    button.draw_button()
+                    print(f"Drawn button: {button.name}, Rect: {button.rect}")
+        elif self.sb.game_state == "Game Active":
+            for _button in self.game_states["Buttons"]:
+                if _button.rect.x != -1000:
+                    _button.save_button_loc()
+                    _button.hide_button()
+                    print(f"Hidden button during game: {_button.name}, Rect: {_button.rect}")
+        
+    def render_state(self, state):
+        self._update_menus()
+        self.screen_state(state)
+        pygame.display.flip()
 
-        self._create_high_score()
-        self._create_score()
-        self._create_level()
-        self._create_lives()
+    def choose_state(self):
+        while not self.gameclass.game_active:
+            print("prev-state", self.prev_state)
+            match self.sb.game_state:
+                case "Start":
+                    self.render_state("Start")
+                case "Pause":
+                    self.render_state("Pause")
+                case "Scores":
+                    self.render_state("Scores")
+                case "Controls":
+                    self.render_state("Controls")
+                case "Win":
+                    self.render_state("Win")
+                case "Fail":
+                    self.render_state("Fail")
+                case "Game Active":
+                    self.screen_state("Game Active")
+                case _:
+                    pass
+        
+    def _update_menus(self):
+        self.gameclass._check_events()
+        self.gameclass.clock.tick(self.settings.framerate)
+        self.gameclass._blit_background()
+        self.gameclass.ship.blitme()
+        self.gameclass.aliens.draw(self.screen)
+        self.show_interface()
+        self.gameclass.mega_shot_bar.blit_bar()
+        self.gameclass.boost_bar.blit_bar()
 
-        self._game_lost()
-        self._game_won()
-
+        for bullet in self.gameclass.bullets.sprites():
+            bullet.draw_bullet()
+        if self.gameclass.mega_bullet is not None:
+            self.gameclass.mega_bullet.draw_bullet()
+    
     def exit_game(self):
         self.gameclass.sb.save_hiscore()
         sys.exit()
