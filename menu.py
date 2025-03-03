@@ -330,32 +330,11 @@ class Menu:
                     _button.save_button_loc()
                     _button.hide_button()
 
-    def _render_state(self, state: str) -> None:
+    def render_state(self) -> None:
+        """Draw GUI on the screen depending on the current sg.game_state."""
         self._update_menus()
-        self._screen_state(state)
+        self._screen_state(self.sb.game_state)
         pygame.display.flip()
-
-    def choose_state(self) -> None:
-        """Chooses state depending on the proided state value."""
-        while not self.gameclass.game_active:
-            print("prev-state", self.prev_state)
-            match self.sb.game_state:
-                case "Start":
-                    self._render_state("Start")
-                case "Pause":
-                    self._render_state("Pause")
-                case "Scores":
-                    self._render_state("Scores")
-                case "Controls":
-                    self._render_state("Controls")
-                case "Win":
-                    self._render_state("Win")
-                case "Fail":
-                    self._render_state("Fail")
-                case "Game Active":
-                    self._screen_state("Game Active")
-                case _:
-                    pass
 
     def _update_menus(self) -> None:
         self.gameclass._check_events()

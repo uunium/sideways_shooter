@@ -332,7 +332,7 @@ class Game:
         if self.mega_bullet is not None:
             self.mega_bullet.draw_bullet()
         if not self.game_active:
-            self.menu.choose_state()
+            self.menu.render_state()
         pygame.display.flip()
 
 
