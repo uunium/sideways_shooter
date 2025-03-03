@@ -74,7 +74,8 @@ class Game:
 
         Update the screen with self._update_screen
         Check for events with self_check events
-        and update the positions of srites and images if self.game_active is True
+        and update the positions of srites and images
+        if self.game_active is True
         """
         while True:
             self._update_screen()
@@ -147,7 +148,8 @@ class Game:
     def mega_shot(self) -> None:
         """Create mega bullet."""
         # check whether mega shot timer is reset
-        if self.timer - self.last_mega_shot_time >= self.settings.mega_shot_delay:
+        mega_shot_delay = self.settings.mega_shot_delay
+        if self.timer - self.last_mega_shot_time >= mega_shot_delay:
             # save the shot time
             self.last_mega_shot_time = self.timer
             # create the bullet and change it's size and colour
@@ -168,7 +170,8 @@ class Game:
         """
         # get the time difference betwen shots
         shot_time_diff = pygame.time.get_ticks() - self.last_shot_time
-        if self.shoot_bullet_mod and shot_time_diff >= self.settings.shot_delay:
+        shot_delay = self.settings.shot_delay
+        if self.shoot_bullet_mod and shot_time_diff >= shot_delay:
             self.shoot_bullet()
 
         # work with bullets
@@ -291,7 +294,8 @@ class Game:
     def boost_ship(self) -> None:
         """Check if boost was replenished.
 
-        Use ship.boost_ship() and then reset boost meter progres with boost_bar.reset_bar().
+        Use ship.boost_ship() and then reset boost meter
+        progres with boost_bar.reset_bar().
         """
         if self.timer - self.ship.boost_time >= self.settings.boost_delay:
             self.ship._boost_ship()
