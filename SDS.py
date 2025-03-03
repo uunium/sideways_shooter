@@ -313,8 +313,14 @@ class Game:
         self._check_collision()
 
     def _blit_background(self) -> None:
-        for y in range(0, self.screen.get_height(), self.background.get_height()):
-            for x in range(0, self.screen.get_width(), self.background.get_width()):
+        """Create background image from the tiles of background variable."""
+        screen_heigh = self.settings.screen_height
+        screen_width = self.settings.screen_width
+        background_height = self.background.get_height()
+        background_width = self.background.get_width()
+
+        for y in range(0, screen_heigh, background_height):
+            for x in range(0, screen_width, background_width):
                 self.screen.blit(self.background, (x, y))
 
     def _update_screen(self) -> None:
