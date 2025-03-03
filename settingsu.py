@@ -1,5 +1,24 @@
+"""Module contains Settings class with game settings."""
+
+from __future__ import annotations
+
+
 class Settings:
-    def __init__(self, gameclass) -> None:
+    """Class to initialize game settings.
+
+    Contains settings for:
+    Game window size
+    Framerate
+    Ship speed
+    Number of lives
+    Bullet speed
+    Delay between shots if space bar is constantly pressed
+    Abilities cooldown duration
+    Alien speed and movement direction
+    """
+
+    def __init__(self, gameclass: "Game") -> None:
+        """Initialise the class and all it's attributes."""
         self.gameclass = gameclass
         self.screen_width = 1280
         self.screen_height = 720

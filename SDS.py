@@ -19,8 +19,10 @@ from highscore import hiscore as hiscore_file
 
 
 class Game:
+    """Main class to run the game."""
 
     def __init__(self) -> None:
+        """Create all needed instances to run the game."""
         pygame.init()
 
         self.settings = Settings(self)
@@ -31,15 +33,17 @@ class Game:
         self.screen = pygame.display.set_mode(
             (self.settings.screen_width, self.settings.screen_height)
         )
+        # Give the game window a name
         pygame.display.set_caption("Sideways Alien Shooter")
+        # Get screen rect
         self.screen_rect = self.screen.get_rect()
         self.game_active = False
         self.background = pygame.image.load("./images/space.png").convert()
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
-        self.last_shot_time = 0
-        self.last_mega_shot_time = 0
-        self.shoot_bullet_mod = False
+        self.last_shot_time: int = 0
+        self.last_mega_shot_time: int = 0
+        self.shoot_bullet_mod: bool = False
         self.aliens = pygame.sprite.Group()
         self.sb = Scoreboard(self)
         self.menu = Menu(self)
@@ -65,7 +69,13 @@ class Game:
 
         self._create_fleet()
 
-    def run_game(self):
+    def run_game(self) -> None:
+        """Run the game.
+
+        Update the screen with self._update_screen
+        Check for events with self_check events
+        and update the positions of srites and images if self.game_active is True
+        """
         while True:
             self._update_screen()
             self._check_events()
@@ -76,21 +86,21 @@ class Game:
                 self._update_bullets()
                 self._update_aliens()
 
-    def _check_events(self):
+    def _check_events(self) -> None:
         for event in pygame.event.get():
             match event.type:
                 case pygame.QUIT:
-                    self.menu.exit_game()
+                    self.menu._exit_game()
                 case pygame.KEYDOWN:
-                    self._keydown_event(event)
+                    self._check_keydown_event(event)
                 case pygame.KEYUP:
-                    self._keyup_event(event)
+                    self._check_keyup_event(event)
                 case pygame.MOUSEBUTTONDOWN:
                     mouse_pos = pygame.mouse.get_pos()
                     self.menu._button_press(mouse_pos)
 
-    def _keydown_event(self, event):
-        match (event.key):
+    def _check_keydown_event(self, event: pygame.event.EventType) -> None:
+        match event.key:
             case pygame.K_UP | pygame.K_w:
                 self.ship.move_up = True
             case pygame.K_DOWN | pygame.K_s:
@@ -111,10 +121,10 @@ class Game:
                 else:
                     self.menu.pause_game()
             case pygame.K_q:
-                self.menu.exit_game()
+                self.menu._exit_game()
 
-    def _keyup_event(self, event):
-        match (event.key):
+    def _check_keyup_event(self, event: pygame.event.EventType) -> None:
+        match event.key:
             case pygame.K_UP | pygame.K_w:
                 self.ship.move_up = False
             case pygame.K_DOWN | pygame.K_s:
@@ -123,109 +133,136 @@ class Game:
                 if self.game_active:
                     self.shoot_bullet_mod = False
 
-    def shoot_bullet(self):
-        """Create a bullet instance and draw it,
-        also save the time of the shot"""
+    def shoot_bullet(self) -> None:
+        """Create a bullet instance and draw it.
+
+        Also save the time of the shot
+        """
+        # save the shot time
         self.last_shot_time = pygame.time.get_ticks()
         new_bullet = Bullet(self)
         self.bullets.add(new_bullet)
         print("Bullet shot")
 
-    def mega_shot(self):
-        """Create mega bullet"""
+    def mega_shot(self) -> None:
+        """Create mega bullet."""
+        # check whether mega shot timer is reset
         if self.timer - self.last_mega_shot_time >= self.settings.mega_shot_delay:
+            # save the shot time
             self.last_mega_shot_time = self.timer
+            # create the bullet and change it's size and colour
             self.mega_bullet = Bullet(self)
             self.mega_bullet.bullet_height *= 5
             self.mega_bullet.bullet_width *= 5
             self.mega_bullet.bullet_color = (0, 255, 0)
-            self.mega_bullet.generate_rect()
+            self.mega_bullet._generate_rect()
+            # reset the progres of Bar GUI
             self.mega_shot_bar.reset_bar(self.last_mega_shot_time)
             print("Mega bullet shot")
 
-    def _update_bullets(self):
-        # Get time difference betwen shots to have aftofire every self.settings.shot_delay miliseconds
+    def _update_bullets(self) -> None:
+        """Process the bullet position and check for collisions.
+
+        Also get the time difference betwen shots to have
+        autofire every self.settings.shot_delay miliseconds
+        """
+        # get the time difference betwen shots
         shot_time_diff = pygame.time.get_ticks() - self.last_shot_time
         if self.shoot_bullet_mod and shot_time_diff >= self.settings.shot_delay:
             self.shoot_bullet()
 
         # work with bullets
+        # check for collision
         collision = pygame.sprite.groupcollide(self.bullets, self.aliens, True, True)
         if collision:
-            for kill in collision.values():
+            for _ in collision.values():
+                # for each collision call sb.bullet_hit()
+                # which rises the score and removes a bullet and an alien
                 self.sb.bullet_hit(self.menu)
-
+        # update the coordinates of the bullets
         self.bullets.update()
-
+        # if a bullet leaves the screen coordinates - delete it
+        # also call sb.bullet_missed()
         for bullet in self.bullets.copy():
             if bullet.rect.left >= self.screen_rect.right:
                 self.sb.bullet_missed(self.menu, bullet)
                 print("Bullet deleted")
 
         # work with Mega Shot if it is alive
+        # logic is similar to the standard bullet
         if self.mega_bullet is not None:
-
             mega_collision = pygame.sprite.spritecollide(
                 self.mega_bullet, self.aliens, True
             )
             if mega_collision:
-                for kill in mega_collision:
+                for _ in mega_collision:
                     self.sb.bullet_hit(self.menu)
-
             self.mega_bullet.update()
 
             if self.mega_bullet.rect.left >= self.screen_rect.right:
                 self.mega_bullet = None
 
-    def _create_fleet(self):
+    def _create_fleet(self) -> None:
+        """Create a fleet of aliens.
+
+        Create a fleet of aliens 8 by 4 in size.
+        """
+        # create the first alien to position everything else
         adam = Alien(self)
+        # position the first alien 15 ship widthes away from the ship
         x = self.ship.rect.width * 15
+        # position the first alien 8 alien heights from the screen center
         y = self.screen_rect.centery - adam.rect.height * 8
 
-        for row in range(4):
-            for line in range(8):
+        # 4 rows of aliens
+        for _ in range(4):
+            # 8 lines of aliens
+            for _ in range(8):
                 new_alien = Alien(self)
                 new_alien.rect.y = y
                 new_alien.rect.x = x
                 self.aliens.add(new_alien)
+                # space the aliens lines 2 alien heights apart
                 y += new_alien.rect.height * 2
                 print("Alien created")
-
+            # space the alien rows 2 alien widthes apart
             x += adam.rect.width * 2
+            # reset the y position
             y = self.screen_rect.centery - adam.rect.height * 8
             print("New Fleet row created")
 
-    def _fleet_check_borders(self):
+    def _check_fleet_borders(self) -> None:
+        """Reverse the direction of alien movement.
+
+        If one of the aliens in the group reaches top or bottom of the screen
+        turn the whole group back.
+        """
         for alien in self.aliens.sprites():
             if alien.check_edges():
-                for alien in self.aliens.sprites():
-                    alien.rect.x -= self.settings.alien_hor_speed
+                for each_alien in self.aliens.sprites():
+                    each_alien.rect.x -= self.settings.alien_hor_speed
                 self.settings.alien_direction *= -1
                 break
 
-    def _fleet_check_earth_contact(self):
+    def _check_fleet_earth_contact(self) -> None:
+        """Check if aliens reached the earth."""
         for alien in self.aliens.sprites():
             if alien.rect.left <= 0:
                 print("Earth reached")
                 self._ship_hit()
                 break
 
-    # def _move_hor(self):
-    #     '''used to continue horizontal movement of aliens'''
-    #     move_duration = pygame.time.get_ticks() - self.hor_move_start
-    #     if move_duration > 500:
-    #             self.settings.alien_ver_speed = self._previous_ver_speed
-    #             self.settings.alien_movement_counter = 0
+    def _ship_hit(self) -> None:
+        """Restart level if ship is hit.
 
-    # def _save_ver_speed(self):
-    #     '''used to save current movement speed of the ship and
-    #     nulify it for smooth alien movement'''
-    #     if self.settings.alien_ver_speed != 0:
-    #         self._previous_ver_speed = self.settings.alien_ver_speed
-    #         self.settings.alien_ver_speed = 0
-    #         print('Border reached')
+        If ship has more than 1 life left:
+        - lover the number of lives.
+        - restart the level by clearing everything and centering the ship.
 
-    def _ship_hit(self):
+        If not:
+        Deactivate the game via game_active and
+        change the sb.game_state to 'Fail'.
+        """
         if self.settings.ships_left > 1:
             self.settings.ships_left -= 1
             sleep(0.5)
@@ -234,32 +271,39 @@ class Game:
             self.ship._center_ship()
             self._create_fleet()
 
-            """_create_lives має бути тут аби оновлювати кількість життів після 
-            кожного контакту з прибульцями"""
+            # _create_lives() should be here to update the number of lives
+            # after every contact with the aliens
             self.menu._create_lives()
         else:
             self.game_active = False
             self.sb.game_state = "Fail"
 
-    def _check_collision(self):
+    def _check_collision(self) -> None:
+        """Check whether ship and aliens rectangles touch.
+
+        If they are - call _ship_hit() and redraw lives GUI.
+        """
         if pygame.sprite.spritecollideany(self.ship, self.aliens):
             print("Ship hit")
             self._ship_hit()
             self.menu._create_lives()
 
-    def boost_ship(self):
+    def boost_ship(self) -> None:
+        """Check if boost was replenished.
+
+        Use ship.boost_ship() and then reset boost meter progres with boost_bar.reset_bar().
+        """
         if self.timer - self.ship.boost_time >= self.settings.boost_delay:
             self.ship._boost_ship()
             self.boost_bar.reset_bar(self.ship.boost_time)
 
-    def _update_aliens(self):
-        self._fleet_check_borders()
-        self._fleet_check_earth_contact()
+    def _update_aliens(self) -> None:
+        self._check_fleet_borders()
+        self._check_fleet_earth_contact()
         self.aliens.update()
         if not self.aliens:
             self.bullets.empty()
             self._create_fleet()
-            # self.settings._reset_stuff()
             self.sb.update_game_speed()
             if self.sb.level == 21:
                 self.game_active = False
@@ -268,17 +312,18 @@ class Game:
 
         self._check_collision()
 
-    def _blit_background(self):
+    def _blit_background(self) -> None:
         for y in range(0, self.screen.get_height(), self.background.get_height()):
             for x in range(0, self.screen.get_width(), self.background.get_width()):
                 self.screen.blit(self.background, (x, y))
 
-    def _update_screen(self):
+    def _update_screen(self) -> None:
+        """Call methods to draw all the necessary stuff on the screen."""
         self.clock.tick(self.settings.framerate)
         self._blit_background()
         self.ship.blitme()
         self.aliens.draw(self.screen)
-        self.menu.show_interface()
+        self.menu._show_interface()
         self.mega_shot_bar.blit_bar()
         self.boost_bar.blit_bar()
 
