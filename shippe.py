@@ -13,7 +13,7 @@ class Ship(pygame.sprite.Sprite):
     gamecalss: "Game"
     screen: pygame.Surface
     screen_rect: pygame.Rect
-    settings: "Settings"
+    settings: Settings
     ship_path: str
     image: pygame.Surface
     rect: pygame.Rect

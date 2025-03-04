@@ -6,6 +6,7 @@ import pygame
 
 from buttons import Button
 from shippe import Ship
+import load_save
 
 
 class Menu:
@@ -20,7 +21,7 @@ class Menu:
         self.screen = gameclass.screen
         self.screen_rect = gameclass.screen_rect
         self.settings = gameclass.settings
-        self.sb = self.gameclass.sb
+        self.sb = gameclass.sb
         self.scores_list: list = []
         self.prev_state: str = "Start"
         self.highest_score: Button | None = None
@@ -65,7 +66,6 @@ class Menu:
     def _button_press(self, mouse_pos: tuple[int, int]) -> None:
         # clear stuff and activate the game (start a new game)
         if not self.gameclass.game_active:
-            print("Button before", self.start_button.rect)
             if (
                 self.start_button.rect.collidepoint(mouse_pos)
                 and self.start_button.rect.x != -1000
@@ -74,9 +74,10 @@ class Menu:
                 self.gameclass.aliens.empty()
                 self.gameclass._create_fleet()
                 self.gameclass.sb.reset_stats()
+                load_save.load_game(self.gameclass)
+                self._show_interface()
                 self.gameclass.game_active = True
                 self.sb.game_state = "Game Active"
-                print(f"Start Button clicked: {self.start_button.rect}")
 
             # pause or unpause
             elif self.resume_button.rect.collidepoint(mouse_pos):
@@ -93,6 +94,10 @@ class Menu:
                 self.sb.game_state = self.prev_state
 
     def _create_high_score(self) -> None:
+        # woraround for not creating high score object everytime
+        if hasattr(self, "score_counter"):
+            del self.hs
+
         self.hs = Button(
             self.gameclass,
             f"{self.gameclass.sb.high_score:,}".replace(",", " "),
@@ -107,6 +112,10 @@ class Menu:
         return None
 
     def _create_score(self) -> None:
+        # woraround for not creating score object everytime
+        if hasattr(self, "score_counter"):
+            del self.score_counter
+
         self.score_counter = Button(
             self.gameclass,
             f"{self.gameclass.sb.score:,}".replace(",", " "),
@@ -121,6 +130,10 @@ class Menu:
         )
 
     def _create_level(self) -> None:
+        # woraround for not creating level object everytime
+        if hasattr(self, "level"):
+            del self.level
+
         self.level = Button(
             self.gameclass,
             f"{self.gameclass.sb.level}",
@@ -135,6 +148,10 @@ class Menu:
         )
 
     def _create_lives(self) -> None:
+        # woraround for not creating score object everytime
+        if hasattr(self, "ship"):
+            del self.ship
+
         self.ship = Group()
         for ship_num in range(self.gameclass.settings.ships_left):
             ship = Ship(self.gameclass)
@@ -353,4 +370,5 @@ class Menu:
 
     def _exit_game(self) -> None:
         self.gameclass.sb.save_hiscore()
+        load_save.save_game(self.gameclass)
         sys.exit()

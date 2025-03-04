@@ -1,7 +1,5 @@
 """Module contains Settings class with game settings."""
 
-from __future__ import annotations
-
 
 class Settings:
     """Class to initialize game settings.
@@ -26,6 +24,7 @@ class Settings:
         self.framerate = 60
 
         self.ship_speed = 3
+        # bb - before boost speed
         self.bb_speed = 0
         self.ships_left = 3
 

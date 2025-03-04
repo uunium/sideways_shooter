@@ -65,7 +65,7 @@ class Button:
         else:
             self.msg_image = self.font.render(msg, True, self.text_color)
         self.msg_rect = self.msg_image.get_rect()
-        self.msg_rect.center = self.rect.center
+        self.msg_rect.center = self.button_rect.center
 
     def hide_button(self) -> None:
         """Move the button rectangle from the screen.
