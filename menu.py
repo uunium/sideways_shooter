@@ -30,10 +30,16 @@ class Menu:
         self._create_menus()
 
         self.game_states = {
-            "Start": (self.start_button, self.scores_button, self.controls_button),
+            "Start": (
+                self.start_button,
+                self.load_button,
+                self.scores_button,
+                self.controls_button,
+            ),
             "Pause": (
                 self.resume_button,
                 self.start_button,
+                self.load_button,
                 self.scores_button,
                 self.controls_button,
             ),
@@ -50,14 +56,21 @@ class Menu:
                 self._game_lost,
                 self.looser_text,
                 self.start_button,
+                self.load_button,
                 self.scores_button,
                 self.controls_button,
             ),
             "Buttons": (
                 self.start_button,
+                self.load_button,
+                self.saves_button,
                 self.scores_button,
                 self.controls_button,
                 self.resume_button,
+                self.back_button,
+            ),
+            "Load": (
+                self.saves_button,
                 self.back_button,
             ),
             "Game Active": None,
@@ -70,15 +83,7 @@ class Menu:
                 self.start_button.rect.collidepoint(mouse_pos)
                 and self.start_button.rect.x != -1000
             ):
-                self.gameclass.bullets.empty()
-                self.gameclass.aliens.empty()
-                self.gameclass._create_fleet()
-                self.gameclass.sb.reset_stats()
-                load_save.load_game(self.gameclass)
-                self._show_interface()
-                self.gameclass.game_active = True
-                self.sb.game_state = "Game Active"
-
+                self._start_game()
             # pause or unpause
             elif self.resume_button.rect.collidepoint(mouse_pos):
                 self.pause_game()
@@ -86,15 +91,56 @@ class Menu:
             elif self.scores_button.rect.collidepoint(mouse_pos):
                 self.prev_state = self.sb.game_state
                 self.sb.game_state = "Scores"
+            # access controls menu
             elif self.controls_button.rect.collidepoint(mouse_pos):
                 self.prev_state = self.sb.game_state
                 self.sb.game_state = "Controls"
+            # go back
             elif self.back_button.rect.collidepoint(mouse_pos):
                 # think on how back button will work
                 self.sb.game_state = self.prev_state
+            # access load menu
+            elif self.load_button.rect.collidepoint(mouse_pos):
+                self.prev_state = self.sb.game_state
+                self.sb.game_state = "Load"
+            elif self.saves_button.rect.collidepoint(mouse_pos):
+                self._start_game("load")
+
+    def _start_game(self, load: str | None = None) -> None:
+        """Start the game.
+
+        load is a flag to notify function if it is called from Loading menu.
+        load should be None or 'load'.
+        """
+        if not load:
+            self.gameclass.bullets.empty()
+            self.gameclass.aliens.empty()
+            self.gameclass._create_fleet()
+            self.gameclass.sb.reset_stats()
+            self.gameclass.game_active = True
+            self.sb.game_state = "Game Active"
+        elif load == "load":
+            self.gameclass.bullets.empty()
+            self.gameclass.aliens.empty()
+            self.gameclass._create_fleet()
+            load_save.load_game(self.gameclass)
+            self._show_interface()
+            self.gameclass.game_active = True
+            self.sb.game_state = "Game Active"
+            self.gameclass.ship._center_ship()
+
+    def _create_start_button(self) -> None:
+        """Create the New Game Button."""
+        self.start_button = Button(
+            self.gameclass,
+            "New game",
+            bg_color=(145, 145, 145),
+        )
+        self.start_button.rect.y -= 70
+        self.start_button.msg_rect.center = self.start_button.rect.center
 
     def _create_high_score(self) -> None:
-        # woraround for not creating high score object everytime
+        # woraround for not creating another high score object everytime
         if hasattr(self, "score_counter"):
             del self.hs
 
@@ -112,7 +158,7 @@ class Menu:
         return None
 
     def _create_score(self) -> None:
-        # woraround for not creating score object everytime
+        # woraround for not another creating score object everytime
         if hasattr(self, "score_counter"):
             del self.score_counter
 
@@ -130,7 +176,7 @@ class Menu:
         )
 
     def _create_level(self) -> None:
-        # woraround for not creating level object everytime
+        # woraround for not creating another level object everytime
         if hasattr(self, "level"):
             del self.level
 
@@ -148,7 +194,7 @@ class Menu:
         )
 
     def _create_lives(self) -> None:
-        # woraround for not creating score object everytime
+        # woraround for not creating another score object everytime
         if hasattr(self, "ship"):
             del self.ship
 
@@ -168,7 +214,7 @@ class Menu:
             "Resume",
             bg_color=(145, 145, 145),
         )
-        self.resume_button.rect.y -= 70
+        self.resume_button.rect.y -= 140
         self.resume_button.msg_rect.center = self.resume_button.rect.center
 
     def _create_scores_button(self) -> None:
@@ -201,18 +247,37 @@ class Menu:
         self.back_button.rect.y = self.screen_rect.height - 100
         self.back_button.msg_rect.center = self.back_button.rect.center
 
-    def _create_menus(self) -> None:
-        """Create all of the buttons to render later.
-
-        Uses method defined earlier.
-        Also creates the Start button.
-        """
-        self.start_button = Button(
+    def _create_load_button(self) -> None:
+        """Create load button."""
+        if hasattr(self, "load_button"):
+            del self.load_button
+        self.load_button = Button(
             self.gameclass,
-            "New game",
+            "Load game",
             bg_color=(145, 145, 145),
         )
 
+    def _create_saves_button(self, save_dict: dict) -> None:
+        """Create saves button."""
+        # workaround for not creating another save object everytime
+        if hasattr(self, "saves_button"):
+            del self.saves_button
+        msg_str = f"Score: {save_dict['score']}, Level: {save_dict['level']}, Lives: {save_dict['ships_left']}"
+        self.saves_button = Button(
+            self.gameclass,
+            msg_str,
+            bg_color=(145, 145, 145),
+            width=400,
+        )
+        self.saves_button.rect.center = self.screen_rect.center
+        self.saves_button.msg_rect.center = self.saves_button.rect.center
+
+    def _create_menus(self) -> None:
+        """Create all of the buttons to render later.
+
+        Uses methods defined earlier.
+        """
+        self._create_start_button()
         self._create_resume_button()
         self._create_scores_button()
         self._create_controls_button()
@@ -222,6 +287,10 @@ class Menu:
         self._create_score()
         self._create_level()
         self._create_lives()
+        self._create_load_button()
+        # next function creates self.saves_button
+        load_save.load_save(self)
+        # load_save.load_save()
 
         self._game_lost()
         self._game_won()

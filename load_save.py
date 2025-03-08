@@ -1,6 +1,7 @@
 """Module for managing save state of the game."""
 
 import json
+from typing import Any
 
 
 def save_game(gameinst: "Game") -> None:  # noqa: F821
@@ -57,6 +58,12 @@ def load_game(gameinst: "Game") -> None:  # noqa: F821
     _change_attributes("sb", scoreboard_attributes, save_dict, gameinst)
 
 
+def load_save(menu_inst: "Menu") -> None:
+    """Load save file into memory and create self.saves_button button."""
+    save_dict = _work_with_file("load")
+    return menu_inst._create_saves_button(save_dict)
+
+
 def _change_attributes(
     module: str, attributes: list, save_dict: dict, gameinst: "Game"
 ) -> None:
@@ -71,8 +78,13 @@ def _change_attributes(
             gameinst.menu._create_score()
 
 
-def _work_with_file(state: "str", save_dict: dict | None = None) -> None | dict:
-    """Write or read from save.json."""
+def _work_with_file(
+    state: "str", save_dict: dict[str, Any] | None = None
+) -> None | dict:
+    """Write or read from save.json.
+
+    Recognised states: 'save' or 'load'.
+    """
     if state == "save":
         with open("save.json", "w") as savefile:
             savefile.write(json.dumps(save_dict))
