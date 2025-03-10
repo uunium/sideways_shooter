@@ -39,7 +39,8 @@ class Menu:
             "Pause": (
                 self.resume_button,
                 self.start_button,
-                self.load_button,
+                self.load_button_pause,
+                self.save_button,
                 self.scores_button,
                 self.controls_button,
             ),
@@ -63,6 +64,7 @@ class Menu:
             "Buttons": (
                 self.start_button,
                 self.load_button,
+                self.save_button,
                 self.saves_button,
                 self.scores_button,
                 self.controls_button,
@@ -77,6 +79,7 @@ class Menu:
         }
 
     def _button_press(self, mouse_pos: tuple[int, int]) -> None:
+        """Decide what to do based on click coordinates."""
         # clear stuff and activate the game (start a new game)
         if not self.gameclass.game_active:
             if (
@@ -100,11 +103,17 @@ class Menu:
                 # think on how back button will work
                 self.sb.game_state = self.prev_state
             # access load menu
-            elif self.load_button.rect.collidepoint(mouse_pos):
+            elif self.load_button.rect.collidepoint(
+                mouse_pos
+            ) or self.load_button_pause.rect.collidepoint(mouse_pos):
                 self.prev_state = self.sb.game_state
                 self.sb.game_state = "Load"
+            # load game
             elif self.saves_button.rect.collidepoint(mouse_pos):
                 self._start_game("load")
+            # save game
+            elif self.save_button.rect.collidepoint(mouse_pos):
+                load_save.save_game(self.gameclass)
 
     def _start_game(self, load: str | None = None) -> None:
         """Start the game.
@@ -140,6 +149,7 @@ class Menu:
         self.start_button.msg_rect.center = self.start_button.rect.center
 
     def _create_high_score(self) -> None:
+        """Create GUI high score button."""
         # woraround for not creating another high score object everytime
         if hasattr(self, "score_counter"):
             del self.hs
@@ -158,6 +168,7 @@ class Menu:
         return None
 
     def _create_score(self) -> None:
+        """Create GUI score button."""
         # woraround for not another creating score object everytime
         if hasattr(self, "score_counter"):
             del self.score_counter
@@ -176,6 +187,7 @@ class Menu:
         )
 
     def _create_level(self) -> None:
+        """Create GUI level indicator."""
         # woraround for not creating another level object everytime
         if hasattr(self, "level"):
             del self.level
@@ -194,6 +206,7 @@ class Menu:
         )
 
     def _create_lives(self) -> None:
+        """Create GUI lives left indicator."""
         # woraround for not creating another score object everytime
         if hasattr(self, "ship"):
             del self.ship
@@ -257,6 +270,20 @@ class Menu:
             bg_color=(145, 145, 145),
         )
 
+    def _create_load_button_pause(self) -> None:
+        if hasattr(self, "load_button_pause"):
+            del self.load_button_pause
+        self.load_button_pause = Button(
+            self.gameclass,
+            "Load game",
+            bg_color=(145, 145, 145),
+        )
+        # move the button 10 pixels to the left of the screen center
+        x, y = self.load_button_pause.rect.topright
+        x = self.screen_rect.centerx - 10
+        self.load_button_pause.rect.topright = (x, y)
+        self.load_button_pause.msg_rect.center = self.load_button_pause.rect.center
+
     def _create_saves_button(self, save_dict: dict) -> None:
         """Create saves button."""
         # workaround for not creating another save object everytime
@@ -267,10 +294,21 @@ class Menu:
             self.gameclass,
             msg_str,
             bg_color=(145, 145, 145),
-            width=400,
+            width=700,
         )
         self.saves_button.rect.center = self.screen_rect.center
         self.saves_button.msg_rect.center = self.saves_button.rect.center
+
+    def _create_save_button(self) -> None:
+        """Crete save button to save the game."""
+        self.save_button = Button(
+            self.gameclass,
+            "Save game",
+            bg_color=(145, 145, 145),
+        )
+        # move the button 10 pixels to the right of the center
+        self.save_button.rect.x = self.screen_rect.centerx + 10
+        self.save_button.msg_rect.center = self.save_button.rect.center
 
     def _create_menus(self) -> None:
         """Create all of the buttons to render later.
@@ -288,9 +326,10 @@ class Menu:
         self._create_level()
         self._create_lives()
         self._create_load_button()
+        self._create_load_button_pause()
         # next function creates self.saves_button
         load_save.load_save(self)
-        # load_save.load_save()
+        self._create_save_button()
 
         self._game_lost()
         self._game_won()
@@ -398,19 +437,23 @@ class Menu:
             score.draw_button()
 
     def _screen_state(self, state: str) -> None:
+        """Draw menu buttons on the screen."""
         print(state)
         if self.sb.game_state != "Game Active":
             for _button in self.game_states["Buttons"]:
+                # Hide buttons which are not in the called state
                 if _button not in self.game_states[state] and _button.rect.x != -1000:
                     _button.save_button_loc()
                     _button.hide_button()
             for button in self.game_states[state]:
+                # Draw or execute buttons from the called state
                 if callable(button):
                     button()
                 elif isinstance(button, Button):
                     button.show_button()
                     button.draw_button()
         elif self.sb.game_state == "Game Active":
+            # if game is active hide all buttons
             for _button in self.game_states["Buttons"]:
                 if _button.rect.x != -1000:
                     _button.save_button_loc()
@@ -439,5 +482,4 @@ class Menu:
 
     def _exit_game(self) -> None:
         self.gameclass.sb.save_hiscore()
-        load_save.save_game(self.gameclass)
         sys.exit()

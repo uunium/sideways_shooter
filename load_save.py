@@ -35,6 +35,7 @@ def save_game(gameinst: "Game") -> None:  # noqa: F821
         "shot_delay": shot_delay,
     }
     _work_with_file("save", save_dict)
+    print("Game saved")
 
 
 def load_game(gameinst: "Game") -> None:  # noqa: F821
