@@ -67,7 +67,7 @@ Only the beginnig of the current level is saved. Actual position of the aliens i
 
 Assets were taken from [opengameart](https://opengameart.org).
 
-Thanks to [Kutejnikov](https://opengameart.org/users/kutejnikovFF) for background [image](https://opengameart.org/content/space-9).
+Thanks to [Kutejnikov](https://opengameart.org/users/kutejnikov) for background [image](https://opengameart.org/content/space-9).
 
 Thank to [hookiz](https://opengameart.org/users/hookiz) for the [ship](https://opengameart.org/content/ship-space-0).
 
