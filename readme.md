@@ -1,6 +1,6 @@
 # About
 
-This game is my Sideways Shooter project form [https://ehmatthes.github.io/pcc_3e/](Plython Crash Course by Eric Matthes)
+This game is my Sideways Shooter project form [Plython Crash Course by Eric Matthes](https://ehmatthes.github.io/pcc_3e/)
 This was my playground to implement features I supposed would make better user expierience.
 
 # Gameplay
@@ -62,3 +62,11 @@ In the pause menus you can:
 
 Only one save supported.
 Only the beginnig of the current level is saved. Actual position of the aliens is not saved.
+
+# Credits
+
+Assets were taken from [opengameart.org].
+Thanks to [Kutejnikov](https://opengameart.org/users/kutejnikovFF) for background [image](https://opengameart.org/content/space-9).
+Thank to [hookiz](https://opengameart.org/users/hookiz) for the [ship](https://opengameart.org/content/ship-space-0).
+Thanks to [Bert-o-Naught](https://opengameart.org/users/bert-o-naught) for the [aliens](https://opengameart.org/content/space-shooter-top-down-2d-pixel-art).
+Thanks to [Jannax](https://opengameart.org/users/jannax) for the [cooldown bars](https://opengameart.org/content/sleek-bars).
